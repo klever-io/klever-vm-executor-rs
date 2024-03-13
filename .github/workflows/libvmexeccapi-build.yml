@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - klever
   pull_request:
 
 env:
@@ -11,22 +12,34 @@ env:
 
 jobs:
   build:
-    name: Build dynamic library for ${{ matrix.os }}
+    name: Build dynamic library for ${{ matrix.os }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: ubuntu-20.04
+            platform: amd64
             artifact_name: libvmexeccapi.so
             make_target: capi-linux-amd64
           - os: macos-11
+            platform: amd64
             artifact_name: libvmexeccapi.dylib
             make_target: capi-osx-amd64
+          - os: macos-11
+            platform: arm
+            artifact_name: libvmexeccapi_arm.dylib
+            make_target: capi-osx-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Add tragets
+        run: |
+          rustup target add aarch64-unknown-linux-gnu
+          rustup target add aarch64-apple-darwin
       - name: Make
         run: make ${{ matrix.make_target }}
+        env:
+          PLATFORM: ${{ matrix.platform }}
       - name: Save artifacts
         uses: actions/upload-artifact@v3
         with:

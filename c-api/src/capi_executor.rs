@@ -5,8 +5,8 @@ use crate::{
     service_singleton::with_service, vm_exec_result_t,
 };
 use libc::c_void;
-use multiversx_chain_vm_executor::Executor;
-use multiversx_chain_vm_executor_wasmer::force_sighandler_reinstall;
+use klever_chain_vm_executor::Executor;
+use klever_chain_vm_executor_wasmer::force_sighandler_reinstall;
 
 #[repr(C)]
 pub struct vm_exec_executor_t;
@@ -97,8 +97,9 @@ pub unsafe extern "C" fn vm_exec_executor_set_vm_hooks_ptr(
 /// C API function, works with raw object pointers.
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
-pub unsafe extern "C" fn vm_exec_executor_destroy(executor: *mut vm_exec_executor_t) {
-    if !executor.is_null() {
-        std::ptr::drop_in_place(executor);
+pub unsafe extern "C" fn vm_exec_executor_destroy(executor_ptr: *mut vm_exec_executor_t) {
+    if !executor_ptr.is_null() {
+        let executor = Box::from_raw(executor_ptr as *mut CapiExecutor);
+        drop(executor)
     }
 }

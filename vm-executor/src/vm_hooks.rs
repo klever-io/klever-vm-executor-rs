@@ -16,29 +16,18 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn get_gas_left(&self) -> i64;
     fn get_sc_address(&self, result_offset: MemPtr);
     fn get_owner_address(&self, result_offset: MemPtr);
-    fn get_shard_of_address(&self, address_offset: MemPtr) -> i32;
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32;
     fn signal_error(&self, message_offset: MemPtr, message_length: MemLength);
     fn get_external_balance(&self, address_offset: MemPtr, result_offset: MemPtr);
     fn get_block_hash(&self, nonce: i64, result_offset: MemPtr) -> i32;
-    fn get_esdt_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32;
-    fn get_esdt_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
-    fn get_esdt_nft_attribute_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
-    fn get_esdt_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
-    fn get_esdt_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, value_handle: i32, properties_offset: MemPtr, hash_offset: MemPtr, name_offset: MemPtr, attributes_offset: MemPtr, creator_offset: MemPtr, royalties_handle: i32, uris_offset: MemPtr) -> i32;
-    fn get_esdt_local_roles(&self, token_id_handle: i32) -> i64;
+    fn get_kda_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32;
+    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
+    fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
+    fn get_kda_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, precision_handle: i32, id_offset: MemPtr, name_offset: MemPtr, creator_offset: MemPtr, logo_offset: MemPtr, initial_supply_offset: MemPtr, circulating_supply_offset: MemPtr, max_supply_offset: MemPtr, minted_offset: MemPtr, burned_offset: MemPtr, royalties_offset: MemPtr, properties_offset: MemPtr, attributes_offset: MemPtr, roles_offset: MemPtr) -> i32;
     fn validate_token_identifier(&self, token_id_handle: i32) -> i32;
-    fn transfer_value(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, length: MemLength) -> i32;
-    fn transfer_value_execute(&self, dest_offset: MemPtr, value_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32;
-    fn transfer_esdt_execute(&self, dest_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, value_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32;
-    fn transfer_esdt_nft_execute(&self, dest_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, value_offset: MemPtr, nonce: i64, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32;
-    fn multi_transfer_esdt_nft_execute(&self, dest_offset: MemPtr, num_token_transfers: i32, token_transfers_args_length_offset: MemPtr, token_transfer_data_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32;
-    fn create_async_call(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, data_length: MemLength, success_offset: MemPtr, success_length: MemLength, error_offset: MemPtr, error_length: MemLength, gas: i64, extra_gas_for_callback: i64) -> i32;
-    fn set_async_context_callback(&self, callback: MemPtr, callback_length: MemLength, data: MemPtr, data_length: MemLength, gas: i64) -> i32;
     fn upgrade_contract(&self, dest_offset: MemPtr, gas_limit: i64, value_offset: MemPtr, code_offset: MemPtr, code_metadata_offset: MemPtr, length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr);
     fn upgrade_from_source_contract(&self, dest_offset: MemPtr, gas_limit: i64, value_offset: MemPtr, source_contract_address_offset: MemPtr, code_metadata_offset: MemPtr, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr);
     fn delete_contract(&self, dest_offset: MemPtr, gas_limit: i64, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr);
-    fn async_call(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, length: MemLength);
     fn get_argument_length(&self, id: i32) -> i32;
     fn get_argument(&self, id: i32, arg_offset: MemPtr) -> i32;
     fn get_function(&self, function_offset: MemPtr) -> i32;
@@ -54,16 +43,16 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn get_caller(&self, result_offset: MemPtr);
     fn check_no_payment(&self);
     fn get_call_value(&self, result_offset: MemPtr) -> i32;
-    fn get_esdt_value(&self, result_offset: MemPtr) -> i32;
-    fn get_esdt_value_by_index(&self, result_offset: MemPtr, index: i32) -> i32;
-    fn get_esdt_token_name(&self, result_offset: MemPtr) -> i32;
-    fn get_esdt_token_name_by_index(&self, result_offset: MemPtr, index: i32) -> i32;
-    fn get_esdt_token_nonce(&self) -> i64;
-    fn get_esdt_token_nonce_by_index(&self, index: i32) -> i64;
-    fn get_current_esdt_nft_nonce(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength) -> i64;
-    fn get_esdt_token_type(&self) -> i32;
-    fn get_esdt_token_type_by_index(&self, index: i32) -> i32;
-    fn get_num_esdt_transfers(&self) -> i32;
+    fn get_kda_value(&self, result_offset: MemPtr) -> i32;
+    fn get_kda_value_by_index(&self, result_offset: MemPtr, index: i32) -> i32;
+    fn get_kda_token_name(&self, result_offset: MemPtr) -> i32;
+    fn get_kda_token_name_by_index(&self, result_offset: MemPtr, index: i32) -> i32;
+    fn get_kda_token_nonce(&self) -> i64;
+    fn get_kda_token_nonce_by_index(&self, index: i32) -> i64;
+    fn get_kda_token_type(&self) -> i32;
+    fn get_kda_token_type_by_index(&self, index: i32) -> i32;
+    fn get_num_kda_transfers(&self) -> i32;
+    fn get_call_value_by_token_name(&self, call_value_offset: MemPtr, token_name_offset: MemPtr, token_name_length: MemLength) -> i32;
     fn get_call_value_token_name(&self, call_value_offset: MemPtr, token_name_offset: MemPtr) -> i32;
     fn get_call_value_token_name_by_index(&self, call_value_offset: MemPtr, token_name_offset: MemPtr, index: i32) -> i32;
     fn write_log(&self, data_pointer: MemPtr, data_length: MemLength, topic_ptr: MemPtr, num_topics: i32);
@@ -103,13 +92,13 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_get_block_random_seed(&self, result_handle: i32);
     fn managed_get_prev_block_random_seed(&self, result_handle: i32);
     fn managed_get_return_data(&self, result_id: i32, result_handle: i32);
-    fn managed_get_multi_esdt_call_value(&self, multi_call_value_handle: i32);
-    fn managed_get_back_transfers(&self, esdt_transfers_value_handle: i32, call_value_handle: i32);
-    fn managed_get_esdt_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32);
-    fn managed_get_esdt_token_data(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32, properties_handle: i32, hash_handle: i32, name_handle: i32, attributes_handle: i32, creator_handle: i32, royalties_handle: i32, uris_handle: i32);
-    fn managed_async_call(&self, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32);
-    fn managed_create_async_call(&self, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32, success_offset: MemPtr, success_length: MemLength, error_offset: MemPtr, error_length: MemLength, gas: i64, extra_gas_for_callback: i64, callback_closure_handle: i32) -> i32;
-    fn managed_get_callback_closure(&self, callback_closure_handle: i32);
+    fn managed_get_kda_call_value(&self, kda_call_value_handle: i32, kda_handle: i32);
+    fn managed_get_multi_kda_call_value(&self, multi_call_value_handle: i32);
+    fn managed_get_back_transfers(&self, kda_transfers_value_handle: i32, call_value_handle: i32);
+    fn managed_get_kda_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32);
+    fn managed_get_user_kda(&self, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32);
+    fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32);
+    fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32);
     fn managed_upgrade_from_source_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, address_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32);
     fn managed_upgrade_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, code_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32);
     fn managed_delete_contract(&self, dest_handle: i32, gas_limit: i64, arguments_handle: i32);
@@ -118,11 +107,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_execute_read_only(&self, gas: i64, address_handle: i32, function_handle: i32, arguments_handle: i32, result_handle: i32) -> i32;
     fn managed_execute_on_same_context(&self, gas: i64, address_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32, result_handle: i32) -> i32;
     fn managed_execute_on_dest_context(&self, gas: i64, address_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32, result_handle: i32) -> i32;
-    fn managed_multi_transfer_esdt_nft_execute(&self, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32;
-    fn managed_transfer_value_execute(&self, dst_handle: i32, value_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32;
-    fn managed_is_esdt_frozen(&self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32;
-    fn managed_is_esdt_limited_transfer(&self, token_id_handle: i32) -> i32;
-    fn managed_is_esdt_paused(&self, token_id_handle: i32) -> i32;
+    fn managed_multi_transfer_kda_nft_execute(&self, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32;
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32);
     fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32);
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32;
@@ -153,10 +138,10 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn big_int_storage_store_unsigned(&self, key_offset: MemPtr, key_length: MemLength, source_handle: i32) -> i32;
     fn big_int_storage_load_unsigned(&self, key_offset: MemPtr, key_length: MemLength, destination_handle: i32) -> i32;
     fn big_int_get_call_value(&self, destination_handle: i32);
-    fn big_int_get_esdt_call_value(&self, destination: i32);
-    fn big_int_get_esdt_call_value_by_index(&self, destination_handle: i32, index: i32);
+    fn big_int_get_kda_call_value(&self, destination: i32);
+    fn big_int_get_kda_call_value_by_index(&self, destination_handle: i32, index: i32);
     fn big_int_get_external_balance(&self, address_offset: MemPtr, result: i32);
-    fn big_int_get_esdt_external_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_handle: i32);
+    fn big_int_get_kda_external_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_handle: i32);
     fn big_int_new(&self, small_value: i64) -> i32;
     fn big_int_unsigned_byte_length(&self, reference_handle: i32) -> i32;
     fn big_int_signed_byte_length(&self, reference_handle: i32) -> i32;
@@ -293,11 +278,6 @@ impl VMHooks for VMHooksDefault {
         println!("Called: get_owner_address");
     }
 
-    fn get_shard_of_address(&self, address_offset: MemPtr) -> i32 {
-        println!("Called: get_shard_of_address");
-        0
-    }
-
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32 {
         println!("Called: is_smart_contract");
         0
@@ -316,73 +296,28 @@ impl VMHooks for VMHooksDefault {
         0
     }
 
-    fn get_esdt_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32 {
-        println!("Called: get_esdt_balance");
+    fn get_kda_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32 {
+        println!("Called: get_kda_balance");
         0
     }
 
-    fn get_esdt_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        println!("Called: get_esdt_nft_name_length");
+    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        println!("Called: get_kda_nft_name_length");
         0
     }
 
-    fn get_esdt_nft_attribute_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        println!("Called: get_esdt_nft_attribute_length");
+    fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        println!("Called: get_kda_nft_uri_length");
         0
     }
 
-    fn get_esdt_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        println!("Called: get_esdt_nft_uri_length");
-        0
-    }
-
-    fn get_esdt_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, value_handle: i32, properties_offset: MemPtr, hash_offset: MemPtr, name_offset: MemPtr, attributes_offset: MemPtr, creator_offset: MemPtr, royalties_handle: i32, uris_offset: MemPtr) -> i32 {
-        println!("Called: get_esdt_token_data");
-        0
-    }
-
-    fn get_esdt_local_roles(&self, token_id_handle: i32) -> i64 {
-        println!("Called: get_esdt_local_roles");
+    fn get_kda_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, precision_handle: i32, id_offset: MemPtr, name_offset: MemPtr, creator_offset: MemPtr, logo_offset: MemPtr, initial_supply_offset: MemPtr, circulating_supply_offset: MemPtr, max_supply_offset: MemPtr, minted_offset: MemPtr, burned_offset: MemPtr, royalties_offset: MemPtr, properties_offset: MemPtr, attributes_offset: MemPtr, roles_offset: MemPtr) -> i32 {
+        println!("Called: get_kda_token_data");
         0
     }
 
     fn validate_token_identifier(&self, token_id_handle: i32) -> i32 {
         println!("Called: validate_token_identifier");
-        0
-    }
-
-    fn transfer_value(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, length: MemLength) -> i32 {
-        println!("Called: transfer_value");
-        0
-    }
-
-    fn transfer_value_execute(&self, dest_offset: MemPtr, value_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        println!("Called: transfer_value_execute");
-        0
-    }
-
-    fn transfer_esdt_execute(&self, dest_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, value_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        println!("Called: transfer_esdt_execute");
-        0
-    }
-
-    fn transfer_esdt_nft_execute(&self, dest_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, value_offset: MemPtr, nonce: i64, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        println!("Called: transfer_esdt_nft_execute");
-        0
-    }
-
-    fn multi_transfer_esdt_nft_execute(&self, dest_offset: MemPtr, num_token_transfers: i32, token_transfers_args_length_offset: MemPtr, token_transfer_data_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        println!("Called: multi_transfer_esdt_nft_execute");
-        0
-    }
-
-    fn create_async_call(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, data_length: MemLength, success_offset: MemPtr, success_length: MemLength, error_offset: MemPtr, error_length: MemLength, gas: i64, extra_gas_for_callback: i64) -> i32 {
-        println!("Called: create_async_call");
-        0
-    }
-
-    fn set_async_context_callback(&self, callback: MemPtr, callback_length: MemLength, data: MemPtr, data_length: MemLength, gas: i64) -> i32 {
-        println!("Called: set_async_context_callback");
         0
     }
 
@@ -396,10 +331,6 @@ impl VMHooks for VMHooksDefault {
 
     fn delete_contract(&self, dest_offset: MemPtr, gas_limit: i64, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) {
         println!("Called: delete_contract");
-    }
-
-    fn async_call(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, length: MemLength) {
-        println!("Called: async_call");
     }
 
     fn get_argument_length(&self, id: i32) -> i32 {
@@ -475,53 +406,53 @@ impl VMHooks for VMHooksDefault {
         0
     }
 
-    fn get_esdt_value(&self, result_offset: MemPtr) -> i32 {
-        println!("Called: get_esdt_value");
+    fn get_kda_value(&self, result_offset: MemPtr) -> i32 {
+        println!("Called: get_kda_value");
         0
     }
 
-    fn get_esdt_value_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
-        println!("Called: get_esdt_value_by_index");
+    fn get_kda_value_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
+        println!("Called: get_kda_value_by_index");
         0
     }
 
-    fn get_esdt_token_name(&self, result_offset: MemPtr) -> i32 {
-        println!("Called: get_esdt_token_name");
+    fn get_kda_token_name(&self, result_offset: MemPtr) -> i32 {
+        println!("Called: get_kda_token_name");
         0
     }
 
-    fn get_esdt_token_name_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
-        println!("Called: get_esdt_token_name_by_index");
+    fn get_kda_token_name_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
+        println!("Called: get_kda_token_name_by_index");
         0
     }
 
-    fn get_esdt_token_nonce(&self) -> i64 {
-        println!("Called: get_esdt_token_nonce");
+    fn get_kda_token_nonce(&self) -> i64 {
+        println!("Called: get_kda_token_nonce");
         0
     }
 
-    fn get_esdt_token_nonce_by_index(&self, index: i32) -> i64 {
-        println!("Called: get_esdt_token_nonce_by_index");
+    fn get_kda_token_nonce_by_index(&self, index: i32) -> i64 {
+        println!("Called: get_kda_token_nonce_by_index");
         0
     }
 
-    fn get_current_esdt_nft_nonce(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength) -> i64 {
-        println!("Called: get_current_esdt_nft_nonce");
+    fn get_kda_token_type(&self) -> i32 {
+        println!("Called: get_kda_token_type");
         0
     }
 
-    fn get_esdt_token_type(&self) -> i32 {
-        println!("Called: get_esdt_token_type");
+    fn get_kda_token_type_by_index(&self, index: i32) -> i32 {
+        println!("Called: get_kda_token_type_by_index");
         0
     }
 
-    fn get_esdt_token_type_by_index(&self, index: i32) -> i32 {
-        println!("Called: get_esdt_token_type_by_index");
+    fn get_num_kda_transfers(&self) -> i32 {
+        println!("Called: get_num_kda_transfers");
         0
     }
 
-    fn get_num_esdt_transfers(&self) -> i32 {
-        println!("Called: get_num_esdt_transfers");
+    fn get_call_value_by_token_name(&self, call_value_offset: MemPtr, token_name_offset: MemPtr, token_name_length: MemLength) -> i32 {
+        println!("Called: get_call_value_by_token_name");
         0
     }
 
@@ -699,33 +630,32 @@ impl VMHooks for VMHooksDefault {
         println!("Called: managed_get_return_data");
     }
 
-    fn managed_get_multi_esdt_call_value(&self, multi_call_value_handle: i32) {
-        println!("Called: managed_get_multi_esdt_call_value");
+    fn managed_get_kda_call_value(&self, kda_call_value_handle: i32, kda_handle: i32) {
+        println!("Called: managed_get_kda_call_value");
     }
 
-    fn managed_get_back_transfers(&self, esdt_transfers_value_handle: i32, call_value_handle: i32) {
+    fn managed_get_multi_kda_call_value(&self, multi_call_value_handle: i32) {
+        println!("Called: managed_get_multi_kda_call_value");
+    }
+
+    fn managed_get_back_transfers(&self, kda_transfers_value_handle: i32, call_value_handle: i32) {
         println!("Called: managed_get_back_transfers");
     }
 
-    fn managed_get_esdt_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32) {
-        println!("Called: managed_get_esdt_balance");
+    fn managed_get_kda_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32) {
+        println!("Called: managed_get_kda_balance");
     }
 
-    fn managed_get_esdt_token_data(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32, properties_handle: i32, hash_handle: i32, name_handle: i32, attributes_handle: i32, creator_handle: i32, royalties_handle: i32, uris_handle: i32) {
-        println!("Called: managed_get_esdt_token_data");
+    fn managed_get_user_kda(&self, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32) {
+        println!("Called: managed_get_user_kda");
     }
 
-    fn managed_async_call(&self, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32) {
-        println!("Called: managed_async_call");
+    fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32) {
+        println!("Called: managed_get_kda_token_data");
     }
 
-    fn managed_create_async_call(&self, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32, success_offset: MemPtr, success_length: MemLength, error_offset: MemPtr, error_length: MemLength, gas: i64, extra_gas_for_callback: i64, callback_closure_handle: i32) -> i32 {
-        println!("Called: managed_create_async_call");
-        0
-    }
-
-    fn managed_get_callback_closure(&self, callback_closure_handle: i32) {
-        println!("Called: managed_get_callback_closure");
+    fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32) {
+        println!("Called: managed_get_kda_roles");
     }
 
     fn managed_upgrade_from_source_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, address_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32) {
@@ -765,28 +695,8 @@ impl VMHooks for VMHooksDefault {
         0
     }
 
-    fn managed_multi_transfer_esdt_nft_execute(&self, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
-        println!("Called: managed_multi_transfer_esdt_nft_execute");
-        0
-    }
-
-    fn managed_transfer_value_execute(&self, dst_handle: i32, value_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
-        println!("Called: managed_transfer_value_execute");
-        0
-    }
-
-    fn managed_is_esdt_frozen(&self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
-        println!("Called: managed_is_esdt_frozen");
-        0
-    }
-
-    fn managed_is_esdt_limited_transfer(&self, token_id_handle: i32) -> i32 {
-        println!("Called: managed_is_esdt_limited_transfer");
-        0
-    }
-
-    fn managed_is_esdt_paused(&self, token_id_handle: i32) -> i32 {
-        println!("Called: managed_is_esdt_paused");
+    fn managed_multi_transfer_kda_nft_execute(&self, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
+        println!("Called: managed_multi_transfer_kda_nft_execute");
         0
     }
 
@@ -919,20 +829,20 @@ impl VMHooks for VMHooksDefault {
         println!("Called: big_int_get_call_value");
     }
 
-    fn big_int_get_esdt_call_value(&self, destination: i32) {
-        println!("Called: big_int_get_esdt_call_value");
+    fn big_int_get_kda_call_value(&self, destination: i32) {
+        println!("Called: big_int_get_kda_call_value");
     }
 
-    fn big_int_get_esdt_call_value_by_index(&self, destination_handle: i32, index: i32) {
-        println!("Called: big_int_get_esdt_call_value_by_index");
+    fn big_int_get_kda_call_value_by_index(&self, destination_handle: i32, index: i32) {
+        println!("Called: big_int_get_kda_call_value_by_index");
     }
 
     fn big_int_get_external_balance(&self, address_offset: MemPtr, result: i32) {
         println!("Called: big_int_get_external_balance");
     }
 
-    fn big_int_get_esdt_external_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_handle: i32) {
-        println!("Called: big_int_get_esdt_external_balance");
+    fn big_int_get_kda_external_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_handle: i32) {
+        println!("Called: big_int_get_kda_external_balance");
     }
 
     fn big_int_new(&self, small_value: i64) -> i32 {

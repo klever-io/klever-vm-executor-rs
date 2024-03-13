@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - klever
   pull_request:
 
 jobs:

@@ -9,13 +9,15 @@ use wasmer::{
 };
 use wasmer_types::{GlobalIndex, ModuleInfo};
 
-use crate::wasmer_helpers::{create_global_index, MiddlewareWithProtectedGlobals};
+use crate::wasmer_helpers::{
+    create_global_index, is_control_flow_operator, MiddlewareWithProtectedGlobals,
+};
 
 const BREAKPOINT_VALUE: &str = "breakpoint_value";
 
 pub(crate) const BREAKPOINT_VALUE_NO_BREAKPOINT: u64 = 0;
-pub(crate) const BREAKPOINT_VALUE_OUT_OF_GAS: u64 = 4;
-pub(crate) const BREAKPOINT_VALUE_MEMORY_LIMIT: u64 = 5;
+pub(crate) const BREAKPOINT_VALUE_OUT_OF_GAS: u64 = 3;
+pub(crate) const BREAKPOINT_VALUE_MEMORY_LIMIT: u64 = 4;
 
 #[derive(Clone, Debug, MemoryUsage)]
 struct BreakpointsGlobalIndex {
@@ -132,10 +134,7 @@ impl FunctionMiddleware for FunctionBreakpoints {
         operator: Operator<'b>,
         state: &mut MiddlewareReaderState<'b>,
     ) -> Result<(), MiddlewareError> {
-        let must_add_breakpoint = matches!(
-            operator,
-            Operator::Call { .. } | Operator::CallIndirect { .. }
-        );
+        let must_add_breakpoint = is_control_flow_operator(&operator);
 
         state.push_operator(operator);
 

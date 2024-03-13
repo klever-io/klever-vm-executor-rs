@@ -26,11 +26,6 @@ fn wasmer_import_get_owner_address(env: &VMHooksWrapper, result_offset: i32) {
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_shard_of_address(env: &VMHooksWrapper, address_offset: i32) -> i32 {
-    env.vm_hooks.get_shard_of_address(env.convert_mem_ptr(address_offset))
-}
-
-#[rustfmt::skip]
 fn wasmer_import_is_smart_contract(env: &VMHooksWrapper, address_offset: i32) -> i32 {
     env.vm_hooks.is_smart_contract(env.convert_mem_ptr(address_offset))
 }
@@ -51,73 +46,28 @@ fn wasmer_import_get_block_hash(env: &VMHooksWrapper, nonce: i64, result_offset:
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_balance(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, result_offset: i32) -> i32 {
-    env.vm_hooks.get_esdt_balance(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, env.convert_mem_ptr(result_offset))
+fn wasmer_import_get_kda_balance(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, result_offset: i32) -> i32 {
+    env.vm_hooks.get_kda_balance(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, env.convert_mem_ptr(result_offset))
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_nft_name_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
-    env.vm_hooks.get_esdt_nft_name_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
+fn wasmer_import_get_kda_nft_name_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
+    env.vm_hooks.get_kda_nft_name_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_nft_attribute_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
-    env.vm_hooks.get_esdt_nft_attribute_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
+fn wasmer_import_get_kda_nft_uri_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
+    env.vm_hooks.get_kda_nft_uri_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_nft_uri_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
-    env.vm_hooks.get_esdt_nft_uri_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_get_esdt_token_data(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, value_handle: i32, properties_offset: i32, hash_offset: i32, name_offset: i32, attributes_offset: i32, creator_offset: i32, royalties_handle: i32, uris_offset: i32) -> i32 {
-    env.vm_hooks.get_esdt_token_data(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, value_handle, env.convert_mem_ptr(properties_offset), env.convert_mem_ptr(hash_offset), env.convert_mem_ptr(name_offset), env.convert_mem_ptr(attributes_offset), env.convert_mem_ptr(creator_offset), royalties_handle, env.convert_mem_ptr(uris_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_get_esdt_local_roles(env: &VMHooksWrapper, token_id_handle: i32) -> i64 {
-    env.vm_hooks.get_esdt_local_roles(token_id_handle)
+fn wasmer_import_get_kda_token_data(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, precision_handle: i32, id_offset: i32, name_offset: i32, creator_offset: i32, logo_offset: i32, initial_supply_offset: i32, circulating_supply_offset: i32, max_supply_offset: i32, minted_offset: i32, burned_offset: i32, royalties_offset: i32, properties_offset: i32, attributes_offset: i32, roles_offset: i32) -> i32 {
+    env.vm_hooks.get_kda_token_data(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, precision_handle, env.convert_mem_ptr(id_offset), env.convert_mem_ptr(name_offset), env.convert_mem_ptr(creator_offset), env.convert_mem_ptr(logo_offset), env.convert_mem_ptr(initial_supply_offset), env.convert_mem_ptr(circulating_supply_offset), env.convert_mem_ptr(max_supply_offset), env.convert_mem_ptr(minted_offset), env.convert_mem_ptr(burned_offset), env.convert_mem_ptr(royalties_offset), env.convert_mem_ptr(properties_offset), env.convert_mem_ptr(attributes_offset), env.convert_mem_ptr(roles_offset))
 }
 
 #[rustfmt::skip]
 fn wasmer_import_validate_token_identifier(env: &VMHooksWrapper, token_id_handle: i32) -> i32 {
     env.vm_hooks.validate_token_identifier(token_id_handle)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_transfer_value(env: &VMHooksWrapper, dest_offset: i32, value_offset: i32, data_offset: i32, length: i32) -> i32 {
-    env.vm_hooks.transfer_value(env.convert_mem_ptr(dest_offset), env.convert_mem_ptr(value_offset), env.convert_mem_ptr(data_offset), env.convert_mem_length(length))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_transfer_value_execute(env: &VMHooksWrapper, dest_offset: i32, value_offset: i32, gas_limit: i64, function_offset: i32, function_length: i32, num_arguments: i32, arguments_length_offset: i32, data_offset: i32) -> i32 {
-    env.vm_hooks.transfer_value_execute(env.convert_mem_ptr(dest_offset), env.convert_mem_ptr(value_offset), gas_limit, env.convert_mem_ptr(function_offset), env.convert_mem_length(function_length), num_arguments, env.convert_mem_ptr(arguments_length_offset), env.convert_mem_ptr(data_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_transfer_esdt_execute(env: &VMHooksWrapper, dest_offset: i32, token_id_offset: i32, token_id_len: i32, value_offset: i32, gas_limit: i64, function_offset: i32, function_length: i32, num_arguments: i32, arguments_length_offset: i32, data_offset: i32) -> i32 {
-    env.vm_hooks.transfer_esdt_execute(env.convert_mem_ptr(dest_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), env.convert_mem_ptr(value_offset), gas_limit, env.convert_mem_ptr(function_offset), env.convert_mem_length(function_length), num_arguments, env.convert_mem_ptr(arguments_length_offset), env.convert_mem_ptr(data_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_transfer_esdt_nft_execute(env: &VMHooksWrapper, dest_offset: i32, token_id_offset: i32, token_id_len: i32, value_offset: i32, nonce: i64, gas_limit: i64, function_offset: i32, function_length: i32, num_arguments: i32, arguments_length_offset: i32, data_offset: i32) -> i32 {
-    env.vm_hooks.transfer_esdt_nft_execute(env.convert_mem_ptr(dest_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), env.convert_mem_ptr(value_offset), nonce, gas_limit, env.convert_mem_ptr(function_offset), env.convert_mem_length(function_length), num_arguments, env.convert_mem_ptr(arguments_length_offset), env.convert_mem_ptr(data_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_multi_transfer_esdt_nft_execute(env: &VMHooksWrapper, dest_offset: i32, num_token_transfers: i32, token_transfers_args_length_offset: i32, token_transfer_data_offset: i32, gas_limit: i64, function_offset: i32, function_length: i32, num_arguments: i32, arguments_length_offset: i32, data_offset: i32) -> i32 {
-    env.vm_hooks.multi_transfer_esdt_nft_execute(env.convert_mem_ptr(dest_offset), num_token_transfers, env.convert_mem_ptr(token_transfers_args_length_offset), env.convert_mem_ptr(token_transfer_data_offset), gas_limit, env.convert_mem_ptr(function_offset), env.convert_mem_length(function_length), num_arguments, env.convert_mem_ptr(arguments_length_offset), env.convert_mem_ptr(data_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_create_async_call(env: &VMHooksWrapper, dest_offset: i32, value_offset: i32, data_offset: i32, data_length: i32, success_offset: i32, success_length: i32, error_offset: i32, error_length: i32, gas: i64, extra_gas_for_callback: i64) -> i32 {
-    env.vm_hooks.create_async_call(env.convert_mem_ptr(dest_offset), env.convert_mem_ptr(value_offset), env.convert_mem_ptr(data_offset), env.convert_mem_length(data_length), env.convert_mem_ptr(success_offset), env.convert_mem_length(success_length), env.convert_mem_ptr(error_offset), env.convert_mem_length(error_length), gas, extra_gas_for_callback)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_set_async_context_callback(env: &VMHooksWrapper, callback: i32, callback_length: i32, data: i32, data_length: i32, gas: i64) -> i32 {
-    env.vm_hooks.set_async_context_callback(env.convert_mem_ptr(callback), env.convert_mem_length(callback_length), env.convert_mem_ptr(data), env.convert_mem_length(data_length), gas)
 }
 
 #[rustfmt::skip]
@@ -133,11 +83,6 @@ fn wasmer_import_upgrade_from_source_contract(env: &VMHooksWrapper, dest_offset:
 #[rustfmt::skip]
 fn wasmer_import_delete_contract(env: &VMHooksWrapper, dest_offset: i32, gas_limit: i64, num_arguments: i32, arguments_length_offset: i32, data_offset: i32) {
     env.vm_hooks.delete_contract(env.convert_mem_ptr(dest_offset), gas_limit, num_arguments, env.convert_mem_ptr(arguments_length_offset), env.convert_mem_ptr(data_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_async_call(env: &VMHooksWrapper, dest_offset: i32, value_offset: i32, data_offset: i32, length: i32) {
-    env.vm_hooks.async_call(env.convert_mem_ptr(dest_offset), env.convert_mem_ptr(value_offset), env.convert_mem_ptr(data_offset), env.convert_mem_length(length))
 }
 
 #[rustfmt::skip]
@@ -216,53 +161,53 @@ fn wasmer_import_get_call_value(env: &VMHooksWrapper, result_offset: i32) -> i32
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_value(env: &VMHooksWrapper, result_offset: i32) -> i32 {
-    env.vm_hooks.get_esdt_value(env.convert_mem_ptr(result_offset))
+fn wasmer_import_get_kda_value(env: &VMHooksWrapper, result_offset: i32) -> i32 {
+    env.vm_hooks.get_kda_value(env.convert_mem_ptr(result_offset))
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_value_by_index(env: &VMHooksWrapper, result_offset: i32, index: i32) -> i32 {
-    env.vm_hooks.get_esdt_value_by_index(env.convert_mem_ptr(result_offset), index)
+fn wasmer_import_get_kda_value_by_index(env: &VMHooksWrapper, result_offset: i32, index: i32) -> i32 {
+    env.vm_hooks.get_kda_value_by_index(env.convert_mem_ptr(result_offset), index)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_token_name(env: &VMHooksWrapper, result_offset: i32) -> i32 {
-    env.vm_hooks.get_esdt_token_name(env.convert_mem_ptr(result_offset))
+fn wasmer_import_get_kda_token_name(env: &VMHooksWrapper, result_offset: i32) -> i32 {
+    env.vm_hooks.get_kda_token_name(env.convert_mem_ptr(result_offset))
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_token_name_by_index(env: &VMHooksWrapper, result_offset: i32, index: i32) -> i32 {
-    env.vm_hooks.get_esdt_token_name_by_index(env.convert_mem_ptr(result_offset), index)
+fn wasmer_import_get_kda_token_name_by_index(env: &VMHooksWrapper, result_offset: i32, index: i32) -> i32 {
+    env.vm_hooks.get_kda_token_name_by_index(env.convert_mem_ptr(result_offset), index)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_token_nonce(env: &VMHooksWrapper) -> i64 {
-    env.vm_hooks.get_esdt_token_nonce()
+fn wasmer_import_get_kda_token_nonce(env: &VMHooksWrapper) -> i64 {
+    env.vm_hooks.get_kda_token_nonce()
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_token_nonce_by_index(env: &VMHooksWrapper, index: i32) -> i64 {
-    env.vm_hooks.get_esdt_token_nonce_by_index(index)
+fn wasmer_import_get_kda_token_nonce_by_index(env: &VMHooksWrapper, index: i32) -> i64 {
+    env.vm_hooks.get_kda_token_nonce_by_index(index)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_current_esdt_nft_nonce(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32) -> i64 {
-    env.vm_hooks.get_current_esdt_nft_nonce(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len))
+fn wasmer_import_get_kda_token_type(env: &VMHooksWrapper) -> i32 {
+    env.vm_hooks.get_kda_token_type()
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_token_type(env: &VMHooksWrapper) -> i32 {
-    env.vm_hooks.get_esdt_token_type()
+fn wasmer_import_get_kda_token_type_by_index(env: &VMHooksWrapper, index: i32) -> i32 {
+    env.vm_hooks.get_kda_token_type_by_index(index)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_esdt_token_type_by_index(env: &VMHooksWrapper, index: i32) -> i32 {
-    env.vm_hooks.get_esdt_token_type_by_index(index)
+fn wasmer_import_get_num_kda_transfers(env: &VMHooksWrapper) -> i32 {
+    env.vm_hooks.get_num_kda_transfers()
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_num_esdt_transfers(env: &VMHooksWrapper) -> i32 {
-    env.vm_hooks.get_num_esdt_transfers()
+fn wasmer_import_get_call_value_by_token_name(env: &VMHooksWrapper, call_value_offset: i32, token_name_offset: i32, token_name_length: i32) -> i32 {
+    env.vm_hooks.get_call_value_by_token_name(env.convert_mem_ptr(call_value_offset), env.convert_mem_ptr(token_name_offset), env.convert_mem_length(token_name_length))
 }
 
 #[rustfmt::skip]
@@ -461,38 +406,38 @@ fn wasmer_import_managed_get_return_data(env: &VMHooksWrapper, result_id: i32, r
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_get_multi_esdt_call_value(env: &VMHooksWrapper, multi_call_value_handle: i32) {
-    env.vm_hooks.managed_get_multi_esdt_call_value(multi_call_value_handle)
+fn wasmer_import_managed_get_kda_call_value(env: &VMHooksWrapper, kda_call_value_handle: i32, kda_handle: i32) {
+    env.vm_hooks.managed_get_kda_call_value(kda_call_value_handle, kda_handle)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_get_back_transfers(env: &VMHooksWrapper, esdt_transfers_value_handle: i32, call_value_handle: i32) {
-    env.vm_hooks.managed_get_back_transfers(esdt_transfers_value_handle, call_value_handle)
+fn wasmer_import_managed_get_multi_kda_call_value(env: &VMHooksWrapper, multi_call_value_handle: i32) {
+    env.vm_hooks.managed_get_multi_kda_call_value(multi_call_value_handle)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_get_esdt_balance(env: &VMHooksWrapper, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32) {
-    env.vm_hooks.managed_get_esdt_balance(address_handle, token_id_handle, nonce, value_handle)
+fn wasmer_import_managed_get_back_transfers(env: &VMHooksWrapper, kda_transfers_value_handle: i32, call_value_handle: i32) {
+    env.vm_hooks.managed_get_back_transfers(kda_transfers_value_handle, call_value_handle)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_get_esdt_token_data(env: &VMHooksWrapper, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32, properties_handle: i32, hash_handle: i32, name_handle: i32, attributes_handle: i32, creator_handle: i32, royalties_handle: i32, uris_handle: i32) {
-    env.vm_hooks.managed_get_esdt_token_data(address_handle, token_id_handle, nonce, value_handle, properties_handle, hash_handle, name_handle, attributes_handle, creator_handle, royalties_handle, uris_handle)
+fn wasmer_import_managed_get_kda_balance(env: &VMHooksWrapper, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32) {
+    env.vm_hooks.managed_get_kda_balance(address_handle, token_id_handle, nonce, value_handle)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_async_call(env: &VMHooksWrapper, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32) {
-    env.vm_hooks.managed_async_call(dest_handle, value_handle, function_handle, arguments_handle)
+fn wasmer_import_managed_get_user_kda(env: &VMHooksWrapper, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32) {
+    env.vm_hooks.managed_get_user_kda(address_handle, ticker_handle, nonce, balance_handle, frozen_handle, last_claim_handle, buckets_handle, mime_handle, metadata_handle)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_create_async_call(env: &VMHooksWrapper, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32, success_offset: i32, success_length: i32, error_offset: i32, error_length: i32, gas: i64, extra_gas_for_callback: i64, callback_closure_handle: i32) -> i32 {
-    env.vm_hooks.managed_create_async_call(dest_handle, value_handle, function_handle, arguments_handle, env.convert_mem_ptr(success_offset), env.convert_mem_length(success_length), env.convert_mem_ptr(error_offset), env.convert_mem_length(error_length), gas, extra_gas_for_callback, callback_closure_handle)
+fn wasmer_import_managed_get_kda_token_data(env: &VMHooksWrapper, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32) {
+    env.vm_hooks.managed_get_kda_token_data(address_handle, ticker_handle, nonce, precision_handle, id_handle, name_handle, creator_handle, logo_handle, uris_handle, initial_supply_handle, circulating_supply_handle, max_supply_handle, minted_handle, burned_handle, royalties_handle, properties_handle, attributes_handle, roles_handle, issue_date_handle)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_get_callback_closure(env: &VMHooksWrapper, callback_closure_handle: i32) {
-    env.vm_hooks.managed_get_callback_closure(callback_closure_handle)
+fn wasmer_import_managed_get_kda_roles(env: &VMHooksWrapper, ticker_handle: i32, roles_handle: i32) {
+    env.vm_hooks.managed_get_kda_roles(ticker_handle, roles_handle)
 }
 
 #[rustfmt::skip]
@@ -536,28 +481,8 @@ fn wasmer_import_managed_execute_on_dest_context(env: &VMHooksWrapper, gas: i64,
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_multi_transfer_esdt_nft_execute(env: &VMHooksWrapper, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
-    env.vm_hooks.managed_multi_transfer_esdt_nft_execute(dst_handle, token_transfers_handle, gas_limit, function_handle, arguments_handle)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_managed_transfer_value_execute(env: &VMHooksWrapper, dst_handle: i32, value_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
-    env.vm_hooks.managed_transfer_value_execute(dst_handle, value_handle, gas_limit, function_handle, arguments_handle)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_managed_is_esdt_frozen(env: &VMHooksWrapper, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
-    env.vm_hooks.managed_is_esdt_frozen(address_handle, token_id_handle, nonce)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_managed_is_esdt_limited_transfer(env: &VMHooksWrapper, token_id_handle: i32) -> i32 {
-    env.vm_hooks.managed_is_esdt_limited_transfer(token_id_handle)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_managed_is_esdt_paused(env: &VMHooksWrapper, token_id_handle: i32) -> i32 {
-    env.vm_hooks.managed_is_esdt_paused(token_id_handle)
+fn wasmer_import_managed_multi_transfer_kda_nft_execute(env: &VMHooksWrapper, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
+    env.vm_hooks.managed_multi_transfer_kda_nft_execute(dst_handle, token_transfers_handle, gas_limit, function_handle, arguments_handle)
 }
 
 #[rustfmt::skip]
@@ -711,13 +636,13 @@ fn wasmer_import_big_int_get_call_value(env: &VMHooksWrapper, destination_handle
 }
 
 #[rustfmt::skip]
-fn wasmer_import_big_int_get_esdt_call_value(env: &VMHooksWrapper, destination: i32) {
-    env.vm_hooks.big_int_get_esdt_call_value(destination)
+fn wasmer_import_big_int_get_kda_call_value(env: &VMHooksWrapper, destination: i32) {
+    env.vm_hooks.big_int_get_kda_call_value(destination)
 }
 
 #[rustfmt::skip]
-fn wasmer_import_big_int_get_esdt_call_value_by_index(env: &VMHooksWrapper, destination_handle: i32, index: i32) {
-    env.vm_hooks.big_int_get_esdt_call_value_by_index(destination_handle, index)
+fn wasmer_import_big_int_get_kda_call_value_by_index(env: &VMHooksWrapper, destination_handle: i32, index: i32) {
+    env.vm_hooks.big_int_get_kda_call_value_by_index(destination_handle, index)
 }
 
 #[rustfmt::skip]
@@ -726,8 +651,8 @@ fn wasmer_import_big_int_get_external_balance(env: &VMHooksWrapper, address_offs
 }
 
 #[rustfmt::skip]
-fn wasmer_import_big_int_get_esdt_external_balance(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, result_handle: i32) {
-    env.vm_hooks.big_int_get_esdt_external_balance(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, result_handle)
+fn wasmer_import_big_int_get_kda_external_balance(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, result_handle: i32) {
+    env.vm_hooks.big_int_get_kda_external_balance(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, result_handle)
 }
 
 #[rustfmt::skip]
@@ -1291,29 +1216,18 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "getGasLeft" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_gas_left),
             "getSCAddress" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_sc_address),
             "getOwnerAddress" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_owner_address),
-            "getShardOfAddress" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_shard_of_address),
             "isSmartContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_is_smart_contract),
             "signalError" => Function::new_native_with_env(store, env.clone(), wasmer_import_signal_error),
             "getExternalBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_external_balance),
             "getBlockHash" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_block_hash),
-            "getESDTBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_balance),
-            "getESDTNFTNameLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_nft_name_length),
-            "getESDTNFTAttributeLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_nft_attribute_length),
-            "getESDTNFTURILength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_nft_uri_length),
-            "getESDTTokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_data),
-            "getESDTLocalRoles" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_local_roles),
+            "getKDABalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_balance),
+            "getKDANFTNameLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_nft_name_length),
+            "getKDANFTURILength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_nft_uri_length),
+            "getKDATokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_data),
             "validateTokenIdentifier" => Function::new_native_with_env(store, env.clone(), wasmer_import_validate_token_identifier),
-            "transferValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_transfer_value),
-            "transferValueExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_transfer_value_execute),
-            "transferESDTExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_transfer_esdt_execute),
-            "transferESDTNFTExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_transfer_esdt_nft_execute),
-            "multiTransferESDTNFTExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_multi_transfer_esdt_nft_execute),
-            "createAsyncCall" => Function::new_native_with_env(store, env.clone(), wasmer_import_create_async_call),
-            "setAsyncContextCallback" => Function::new_native_with_env(store, env.clone(), wasmer_import_set_async_context_callback),
             "upgradeContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_upgrade_contract),
             "upgradeFromSourceContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_upgrade_from_source_contract),
             "deleteContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_delete_contract),
-            "asyncCall" => Function::new_native_with_env(store, env.clone(), wasmer_import_async_call),
             "getArgumentLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_argument_length),
             "getArgument" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_argument),
             "getFunction" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_function),
@@ -1329,16 +1243,16 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "getCaller" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_caller),
             "checkNoPayment" => Function::new_native_with_env(store, env.clone(), wasmer_import_check_no_payment),
             "getCallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_call_value),
-            "getESDTValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_value),
-            "getESDTValueByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_value_by_index),
-            "getESDTTokenName" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_name),
-            "getESDTTokenNameByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_name_by_index),
-            "getESDTTokenNonce" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_nonce),
-            "getESDTTokenNonceByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_nonce_by_index),
-            "getCurrentESDTNFTNonce" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_current_esdt_nft_nonce),
-            "getESDTTokenType" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_type),
-            "getESDTTokenTypeByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_esdt_token_type_by_index),
-            "getNumESDTTransfers" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_num_esdt_transfers),
+            "getKDAValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_value),
+            "getKDAValueByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_value_by_index),
+            "getKDATokenName" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_name),
+            "getKDATokenNameByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_name_by_index),
+            "getKDATokenNonce" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_nonce),
+            "getKDATokenNonceByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_nonce_by_index),
+            "getKDATokenType" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_type),
+            "getKDATokenTypeByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_type_by_index),
+            "getNumKDATransfers" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_num_kda_transfers),
+            "getCallValueByTokenName" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_call_value_by_token_name),
             "getCallValueTokenName" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_call_value_token_name),
             "getCallValueTokenNameByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_call_value_token_name_by_index),
             "writeLog" => Function::new_native_with_env(store, env.clone(), wasmer_import_write_log),
@@ -1378,13 +1292,13 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "managedGetBlockRandomSeed" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_block_random_seed),
             "managedGetPrevBlockRandomSeed" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_prev_block_random_seed),
             "managedGetReturnData" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_return_data),
-            "managedGetMultiESDTCallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_multi_esdt_call_value),
+            "managedGetKDACallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_call_value),
+            "managedGetMultiKDACallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_multi_kda_call_value),
             "managedGetBackTransfers" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_back_transfers),
-            "managedGetESDTBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_esdt_balance),
-            "managedGetESDTTokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_esdt_token_data),
-            "managedAsyncCall" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_async_call),
-            "managedCreateAsyncCall" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_create_async_call),
-            "managedGetCallbackClosure" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_callback_closure),
+            "managedGetKDABalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_balance),
+            "managedGetUserKDA" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_user_kda),
+            "managedGetKDATokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_token_data),
+            "managedGetKDARoles" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_roles),
             "managedUpgradeFromSourceContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_upgrade_from_source_contract),
             "managedUpgradeContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_upgrade_contract),
             "managedDeleteContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_delete_contract),
@@ -1393,11 +1307,7 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "managedExecuteReadOnly" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_execute_read_only),
             "managedExecuteOnSameContext" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_execute_on_same_context),
             "managedExecuteOnDestContext" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_execute_on_dest_context),
-            "managedMultiTransferESDTNFTExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_multi_transfer_esdt_nft_execute),
-            "managedTransferValueExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_transfer_value_execute),
-            "managedIsESDTFrozen" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_is_esdt_frozen),
-            "managedIsESDTLimitedTransfer" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_is_esdt_limited_transfer),
-            "managedIsESDTPaused" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_is_esdt_paused),
+            "managedMultiTransferKDANFTExecute" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_multi_transfer_kda_nft_execute),
             "managedBufferToHex" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_buffer_to_hex),
             "managedGetCodeMetadata" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_code_metadata),
             "managedIsBuiltinFunction" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_is_builtin_function),
@@ -1428,10 +1338,10 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "bigIntStorageStoreUnsigned" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_storage_store_unsigned),
             "bigIntStorageLoadUnsigned" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_storage_load_unsigned),
             "bigIntGetCallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_call_value),
-            "bigIntGetESDTCallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_esdt_call_value),
-            "bigIntGetESDTCallValueByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_esdt_call_value_by_index),
+            "bigIntGetKDACallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_kda_call_value),
+            "bigIntGetKDACallValueByIndex" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_kda_call_value_by_index),
             "bigIntGetExternalBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_external_balance),
-            "bigIntGetESDTExternalBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_esdt_external_balance),
+            "bigIntGetKDAExternalBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_get_kda_external_balance),
             "bigIntNew" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_new),
             "bigIntUnsignedByteLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_unsigned_byte_length),
             "bigIntSignedByteLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_big_int_signed_byte_length),

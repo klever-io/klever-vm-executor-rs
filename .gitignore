@@ -11,3 +11,5 @@ Cargo.lock
 
 # Personal scripts
 my-*
+
+.idea

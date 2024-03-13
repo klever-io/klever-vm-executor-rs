@@ -1,5 +1,5 @@
-use multiversx_chain_vm_executor::{CompilationOptions, ExecutorService, Instance, VMHooksDefault};
-use multiversx_chain_vm_executor_wasmer::BasicExecutorService;
+use klever_chain_vm_executor::{CompilationOptions, ExecutorService, Instance, VMHooksDefault};
+use klever_chain_vm_executor_wasmer::BasicExecutorService;
 use wasmer::wat2wasm;
 
 const DUMMY_COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks};
+use klever_chain_vm_executor::{MemLength, MemPtr, VMHooks};
 use wasmer::WasmerEnv;
 
 #[derive(Clone, Debug)]
