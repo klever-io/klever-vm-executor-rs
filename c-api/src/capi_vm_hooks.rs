@@ -6,7 +6,7 @@
 
 use std::ffi::c_void;
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr};
+use klever_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::capi_vm_hook_pointers::vm_exec_vm_hook_c_func_pointers;
 
@@ -34,7 +34,7 @@ impl CapiVMHooks {
 }
 
 #[rustfmt::skip]
-impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
+impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
     fn set_vm_hooks_ptr(&mut self, vm_hooks_ptr: *mut c_void) {
         self.vm_hooks_ptr = vm_hooks_ptr;
     }
@@ -49,10 +49,6 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
 
     fn get_owner_address(&self, result_offset: MemPtr) {
         (self.c_func_pointers_ptr.get_owner_address_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset))
-    }
-
-    fn get_shard_of_address(&self, address_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.get_shard_of_address_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset))
     }
 
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32 {
@@ -71,60 +67,24 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.get_block_hash_func_ptr)(self.vm_hooks_ptr, nonce, self.convert_mem_ptr(result_offset))
     }
 
-    fn get_esdt_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_balance_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, self.convert_mem_ptr(result_offset))
+    fn get_kda_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_balance_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, self.convert_mem_ptr(result_offset))
     }
 
-    fn get_esdt_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_nft_name_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
+    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_nft_name_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
     }
 
-    fn get_esdt_nft_attribute_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_nft_attribute_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
+    fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_nft_uri_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
     }
 
-    fn get_esdt_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_nft_uri_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
-    }
-
-    fn get_esdt_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, value_handle: i32, properties_offset: MemPtr, hash_offset: MemPtr, name_offset: MemPtr, attributes_offset: MemPtr, creator_offset: MemPtr, royalties_handle: i32, uris_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_token_data_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, value_handle, self.convert_mem_ptr(properties_offset), self.convert_mem_ptr(hash_offset), self.convert_mem_ptr(name_offset), self.convert_mem_ptr(attributes_offset), self.convert_mem_ptr(creator_offset), royalties_handle, self.convert_mem_ptr(uris_offset))
-    }
-
-    fn get_esdt_local_roles(&self, token_id_handle: i32) -> i64 {
-        (self.c_func_pointers_ptr.get_esdt_local_roles_func_ptr)(self.vm_hooks_ptr, token_id_handle)
+    fn get_kda_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, precision_handle: i32, id_offset: MemPtr, name_offset: MemPtr, creator_offset: MemPtr, logo_offset: MemPtr, initial_supply_offset: MemPtr, circulating_supply_offset: MemPtr, max_supply_offset: MemPtr, minted_offset: MemPtr, burned_offset: MemPtr, royalties_offset: MemPtr, properties_offset: MemPtr, attributes_offset: MemPtr, roles_offset: MemPtr) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_token_data_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, precision_handle, self.convert_mem_ptr(id_offset), self.convert_mem_ptr(name_offset), self.convert_mem_ptr(creator_offset), self.convert_mem_ptr(logo_offset), self.convert_mem_ptr(initial_supply_offset), self.convert_mem_ptr(circulating_supply_offset), self.convert_mem_ptr(max_supply_offset), self.convert_mem_ptr(minted_offset), self.convert_mem_ptr(burned_offset), self.convert_mem_ptr(royalties_offset), self.convert_mem_ptr(properties_offset), self.convert_mem_ptr(attributes_offset), self.convert_mem_ptr(roles_offset))
     }
 
     fn validate_token_identifier(&self, token_id_handle: i32) -> i32 {
         (self.c_func_pointers_ptr.validate_token_identifier_func_ptr)(self.vm_hooks_ptr, token_id_handle)
-    }
-
-    fn transfer_value(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, length: MemLength) -> i32 {
-        (self.c_func_pointers_ptr.transfer_value_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), self.convert_mem_ptr(value_offset), self.convert_mem_ptr(data_offset), self.convert_mem_length(length))
-    }
-
-    fn transfer_value_execute(&self, dest_offset: MemPtr, value_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.transfer_value_execute_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), self.convert_mem_ptr(value_offset), gas_limit, self.convert_mem_ptr(function_offset), self.convert_mem_length(function_length), num_arguments, self.convert_mem_ptr(arguments_length_offset), self.convert_mem_ptr(data_offset))
-    }
-
-    fn transfer_esdt_execute(&self, dest_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, value_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.transfer_esdt_execute_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), self.convert_mem_ptr(value_offset), gas_limit, self.convert_mem_ptr(function_offset), self.convert_mem_length(function_length), num_arguments, self.convert_mem_ptr(arguments_length_offset), self.convert_mem_ptr(data_offset))
-    }
-
-    fn transfer_esdt_nft_execute(&self, dest_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, value_offset: MemPtr, nonce: i64, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.transfer_esdt_nft_execute_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), self.convert_mem_ptr(value_offset), nonce, gas_limit, self.convert_mem_ptr(function_offset), self.convert_mem_length(function_length), num_arguments, self.convert_mem_ptr(arguments_length_offset), self.convert_mem_ptr(data_offset))
-    }
-
-    fn multi_transfer_esdt_nft_execute(&self, dest_offset: MemPtr, num_token_transfers: i32, token_transfers_args_length_offset: MemPtr, token_transfer_data_offset: MemPtr, gas_limit: i64, function_offset: MemPtr, function_length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.multi_transfer_esdt_nft_execute_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), num_token_transfers, self.convert_mem_ptr(token_transfers_args_length_offset), self.convert_mem_ptr(token_transfer_data_offset), gas_limit, self.convert_mem_ptr(function_offset), self.convert_mem_length(function_length), num_arguments, self.convert_mem_ptr(arguments_length_offset), self.convert_mem_ptr(data_offset))
-    }
-
-    fn create_async_call(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, data_length: MemLength, success_offset: MemPtr, success_length: MemLength, error_offset: MemPtr, error_length: MemLength, gas: i64, extra_gas_for_callback: i64) -> i32 {
-        (self.c_func_pointers_ptr.create_async_call_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), self.convert_mem_ptr(value_offset), self.convert_mem_ptr(data_offset), self.convert_mem_length(data_length), self.convert_mem_ptr(success_offset), self.convert_mem_length(success_length), self.convert_mem_ptr(error_offset), self.convert_mem_length(error_length), gas, extra_gas_for_callback)
-    }
-
-    fn set_async_context_callback(&self, callback: MemPtr, callback_length: MemLength, data: MemPtr, data_length: MemLength, gas: i64) -> i32 {
-        (self.c_func_pointers_ptr.set_async_context_callback_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(callback), self.convert_mem_length(callback_length), self.convert_mem_ptr(data), self.convert_mem_length(data_length), gas)
     }
 
     fn upgrade_contract(&self, dest_offset: MemPtr, gas_limit: i64, value_offset: MemPtr, code_offset: MemPtr, code_metadata_offset: MemPtr, length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) {
@@ -137,10 +97,6 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
 
     fn delete_contract(&self, dest_offset: MemPtr, gas_limit: i64, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr) {
         (self.c_func_pointers_ptr.delete_contract_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), gas_limit, num_arguments, self.convert_mem_ptr(arguments_length_offset), self.convert_mem_ptr(data_offset))
-    }
-
-    fn async_call(&self, dest_offset: MemPtr, value_offset: MemPtr, data_offset: MemPtr, length: MemLength) {
-        (self.c_func_pointers_ptr.async_call_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(dest_offset), self.convert_mem_ptr(value_offset), self.convert_mem_ptr(data_offset), self.convert_mem_length(length))
     }
 
     fn get_argument_length(&self, id: i32) -> i32 {
@@ -203,44 +159,44 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.get_call_value_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset))
     }
 
-    fn get_esdt_value(&self, result_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_value_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset))
+    fn get_kda_value(&self, result_offset: MemPtr) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_value_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset))
     }
 
-    fn get_esdt_value_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_value_by_index_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset), index)
+    fn get_kda_value_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_value_by_index_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset), index)
     }
 
-    fn get_esdt_token_name(&self, result_offset: MemPtr) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_token_name_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset))
+    fn get_kda_token_name(&self, result_offset: MemPtr) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_token_name_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset))
     }
 
-    fn get_esdt_token_name_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_token_name_by_index_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset), index)
+    fn get_kda_token_name_by_index(&self, result_offset: MemPtr, index: i32) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_token_name_by_index_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(result_offset), index)
     }
 
-    fn get_esdt_token_nonce(&self) -> i64 {
-        (self.c_func_pointers_ptr.get_esdt_token_nonce_func_ptr)(self.vm_hooks_ptr)
+    fn get_kda_token_nonce(&self) -> i64 {
+        (self.c_func_pointers_ptr.get_kda_token_nonce_func_ptr)(self.vm_hooks_ptr)
     }
 
-    fn get_esdt_token_nonce_by_index(&self, index: i32) -> i64 {
-        (self.c_func_pointers_ptr.get_esdt_token_nonce_by_index_func_ptr)(self.vm_hooks_ptr, index)
+    fn get_kda_token_nonce_by_index(&self, index: i32) -> i64 {
+        (self.c_func_pointers_ptr.get_kda_token_nonce_by_index_func_ptr)(self.vm_hooks_ptr, index)
     }
 
-    fn get_current_esdt_nft_nonce(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength) -> i64 {
-        (self.c_func_pointers_ptr.get_current_esdt_nft_nonce_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len))
+    fn get_kda_token_type(&self) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_token_type_func_ptr)(self.vm_hooks_ptr)
     }
 
-    fn get_esdt_token_type(&self) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_token_type_func_ptr)(self.vm_hooks_ptr)
+    fn get_kda_token_type_by_index(&self, index: i32) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_token_type_by_index_func_ptr)(self.vm_hooks_ptr, index)
     }
 
-    fn get_esdt_token_type_by_index(&self, index: i32) -> i32 {
-        (self.c_func_pointers_ptr.get_esdt_token_type_by_index_func_ptr)(self.vm_hooks_ptr, index)
+    fn get_num_kda_transfers(&self) -> i32 {
+        (self.c_func_pointers_ptr.get_num_kda_transfers_func_ptr)(self.vm_hooks_ptr)
     }
 
-    fn get_num_esdt_transfers(&self) -> i32 {
-        (self.c_func_pointers_ptr.get_num_esdt_transfers_func_ptr)(self.vm_hooks_ptr)
+    fn get_call_value_by_token_name(&self, call_value_offset: MemPtr, token_name_offset: MemPtr, token_name_length: MemLength) -> i32 {
+        (self.c_func_pointers_ptr.get_call_value_by_token_name_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(call_value_offset), self.convert_mem_ptr(token_name_offset), self.convert_mem_length(token_name_length))
     }
 
     fn get_call_value_token_name(&self, call_value_offset: MemPtr, token_name_offset: MemPtr) -> i32 {
@@ -399,32 +355,32 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_get_return_data_func_ptr)(self.vm_hooks_ptr, result_id, result_handle)
     }
 
-    fn managed_get_multi_esdt_call_value(&self, multi_call_value_handle: i32) {
-        (self.c_func_pointers_ptr.managed_get_multi_esdt_call_value_func_ptr)(self.vm_hooks_ptr, multi_call_value_handle)
+    fn managed_get_kda_call_value(&self, kda_call_value_handle: i32, kda_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_kda_call_value_func_ptr)(self.vm_hooks_ptr, kda_call_value_handle, kda_handle)
     }
 
-    fn managed_get_back_transfers(&self, esdt_transfers_value_handle: i32, call_value_handle: i32) {
-        (self.c_func_pointers_ptr.managed_get_back_transfers_func_ptr)(self.vm_hooks_ptr, esdt_transfers_value_handle, call_value_handle)
+    fn managed_get_multi_kda_call_value(&self, multi_call_value_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_multi_kda_call_value_func_ptr)(self.vm_hooks_ptr, multi_call_value_handle)
     }
 
-    fn managed_get_esdt_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32) {
-        (self.c_func_pointers_ptr.managed_get_esdt_balance_func_ptr)(self.vm_hooks_ptr, address_handle, token_id_handle, nonce, value_handle)
+    fn managed_get_back_transfers(&self, kda_transfers_value_handle: i32, call_value_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_back_transfers_func_ptr)(self.vm_hooks_ptr, kda_transfers_value_handle, call_value_handle)
     }
 
-    fn managed_get_esdt_token_data(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32, properties_handle: i32, hash_handle: i32, name_handle: i32, attributes_handle: i32, creator_handle: i32, royalties_handle: i32, uris_handle: i32) {
-        (self.c_func_pointers_ptr.managed_get_esdt_token_data_func_ptr)(self.vm_hooks_ptr, address_handle, token_id_handle, nonce, value_handle, properties_handle, hash_handle, name_handle, attributes_handle, creator_handle, royalties_handle, uris_handle)
+    fn managed_get_kda_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_kda_balance_func_ptr)(self.vm_hooks_ptr, address_handle, token_id_handle, nonce, value_handle)
     }
 
-    fn managed_async_call(&self, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32) {
-        (self.c_func_pointers_ptr.managed_async_call_func_ptr)(self.vm_hooks_ptr, dest_handle, value_handle, function_handle, arguments_handle)
+    fn managed_get_user_kda(&self, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_user_kda_func_ptr)(self.vm_hooks_ptr, address_handle, ticker_handle, nonce, balance_handle, frozen_handle, last_claim_handle, buckets_handle, mime_handle, metadata_handle)
     }
 
-    fn managed_create_async_call(&self, dest_handle: i32, value_handle: i32, function_handle: i32, arguments_handle: i32, success_offset: MemPtr, success_length: MemLength, error_offset: MemPtr, error_length: MemLength, gas: i64, extra_gas_for_callback: i64, callback_closure_handle: i32) -> i32 {
-        (self.c_func_pointers_ptr.managed_create_async_call_func_ptr)(self.vm_hooks_ptr, dest_handle, value_handle, function_handle, arguments_handle, self.convert_mem_ptr(success_offset), self.convert_mem_length(success_length), self.convert_mem_ptr(error_offset), self.convert_mem_length(error_length), gas, extra_gas_for_callback, callback_closure_handle)
+    fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_kda_token_data_func_ptr)(self.vm_hooks_ptr, address_handle, ticker_handle, nonce, precision_handle, id_handle, name_handle, creator_handle, logo_handle, uris_handle, initial_supply_handle, circulating_supply_handle, max_supply_handle, minted_handle, burned_handle, royalties_handle, properties_handle, attributes_handle, roles_handle, issue_date_handle)
     }
 
-    fn managed_get_callback_closure(&self, callback_closure_handle: i32) {
-        (self.c_func_pointers_ptr.managed_get_callback_closure_func_ptr)(self.vm_hooks_ptr, callback_closure_handle)
+    fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_kda_roles_func_ptr)(self.vm_hooks_ptr, ticker_handle, roles_handle)
     }
 
     fn managed_upgrade_from_source_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, address_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32) {
@@ -459,24 +415,8 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_execute_on_dest_context_func_ptr)(self.vm_hooks_ptr, gas, address_handle, value_handle, function_handle, arguments_handle, result_handle)
     }
 
-    fn managed_multi_transfer_esdt_nft_execute(&self, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
-        (self.c_func_pointers_ptr.managed_multi_transfer_esdt_nft_execute_func_ptr)(self.vm_hooks_ptr, dst_handle, token_transfers_handle, gas_limit, function_handle, arguments_handle)
-    }
-
-    fn managed_transfer_value_execute(&self, dst_handle: i32, value_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
-        (self.c_func_pointers_ptr.managed_transfer_value_execute_func_ptr)(self.vm_hooks_ptr, dst_handle, value_handle, gas_limit, function_handle, arguments_handle)
-    }
-
-    fn managed_is_esdt_frozen(&self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
-        (self.c_func_pointers_ptr.managed_is_esdt_frozen_func_ptr)(self.vm_hooks_ptr, address_handle, token_id_handle, nonce)
-    }
-
-    fn managed_is_esdt_limited_transfer(&self, token_id_handle: i32) -> i32 {
-        (self.c_func_pointers_ptr.managed_is_esdt_limited_transfer_func_ptr)(self.vm_hooks_ptr, token_id_handle)
-    }
-
-    fn managed_is_esdt_paused(&self, token_id_handle: i32) -> i32 {
-        (self.c_func_pointers_ptr.managed_is_esdt_paused_func_ptr)(self.vm_hooks_ptr, token_id_handle)
+    fn managed_multi_transfer_kda_nft_execute(&self, dst_handle: i32, token_transfers_handle: i32, gas_limit: i64, function_handle: i32, arguments_handle: i32) -> i32 {
+        (self.c_func_pointers_ptr.managed_multi_transfer_kda_nft_execute_func_ptr)(self.vm_hooks_ptr, dst_handle, token_transfers_handle, gas_limit, function_handle, arguments_handle)
     }
 
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32) {
@@ -599,20 +539,20 @@ impl multiversx_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.big_int_get_call_value_func_ptr)(self.vm_hooks_ptr, destination_handle)
     }
 
-    fn big_int_get_esdt_call_value(&self, destination: i32) {
-        (self.c_func_pointers_ptr.big_int_get_esdt_call_value_func_ptr)(self.vm_hooks_ptr, destination)
+    fn big_int_get_kda_call_value(&self, destination: i32) {
+        (self.c_func_pointers_ptr.big_int_get_kda_call_value_func_ptr)(self.vm_hooks_ptr, destination)
     }
 
-    fn big_int_get_esdt_call_value_by_index(&self, destination_handle: i32, index: i32) {
-        (self.c_func_pointers_ptr.big_int_get_esdt_call_value_by_index_func_ptr)(self.vm_hooks_ptr, destination_handle, index)
+    fn big_int_get_kda_call_value_by_index(&self, destination_handle: i32, index: i32) {
+        (self.c_func_pointers_ptr.big_int_get_kda_call_value_by_index_func_ptr)(self.vm_hooks_ptr, destination_handle, index)
     }
 
     fn big_int_get_external_balance(&self, address_offset: MemPtr, result: i32) {
         (self.c_func_pointers_ptr.big_int_get_external_balance_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), result)
     }
 
-    fn big_int_get_esdt_external_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_handle: i32) {
-        (self.c_func_pointers_ptr.big_int_get_esdt_external_balance_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, result_handle)
+    fn big_int_get_kda_external_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_handle: i32) {
+        (self.c_func_pointers_ptr.big_int_get_kda_external_balance_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, result_handle)
     }
 
     fn big_int_new(&self, small_value: i64) -> i32 {

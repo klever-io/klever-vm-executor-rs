@@ -6,17 +6,14 @@ pub enum BreakpointValue {
     /// Failure indicated by the high-level VM (in the VMHooks).
     ExecutionFailed = 1,
 
-    /// Stopping execution due to an async call.
-    AsyncCall = 2,
-
     /// Stopping due to an error signalled by the contract.
-    SignalError = 3,
+    SignalError = 2,
 
     /// Stopping due to gas being exhausted.
-    OutOfGas = 4,
+    OutOfGas = 3,
 
     /// Stopping due to over-allocation of WASM memory.
-    MemoryLimit = 5,
+    MemoryLimit = 4,
 }
 
 impl BreakpointValue {
@@ -32,10 +29,9 @@ impl TryFrom<u64> for BreakpointValue {
         match value {
             0 => Ok(BreakpointValue::None),
             1 => Ok(BreakpointValue::ExecutionFailed),
-            2 => Ok(BreakpointValue::AsyncCall),
-            3 => Ok(BreakpointValue::SignalError),
-            4 => Ok(BreakpointValue::OutOfGas),
-            5 => Ok(BreakpointValue::MemoryLimit),
+            2 => Ok(BreakpointValue::SignalError),
+            3 => Ok(BreakpointValue::OutOfGas),
+            4 => Ok(BreakpointValue::MemoryLimit),
             _ => Err("unknown breakpoint".to_string()),
         }
     }

@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-chain-vm-executor-c-api"
+name = "klever-chain-vm-executor-c-api"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -8,8 +8,8 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
-multiversx-chain-vm-executor = { path = "../vm-executor" }
-multiversx-chain-vm-executor-wasmer = { path = "../vm-executor-wasmer" }
+klever-chain-vm-executor = { path = "../vm-executor" }
+klever-chain-vm-executor-wasmer = { path = "../vm-executor-wasmer" }
 
 lazy_static = "1.4"
 libc = { version = "^0.2", default-features = false }

@@ -6,7 +6,7 @@ use crate::{
     string_copy, vm_exec_result_t,
 };
 use libc::{c_char, c_int};
-use multiversx_chain_vm_executor::{CompilationOptions, Instance};
+use klever_chain_vm_executor::{CompilationOptions, Instance};
 use std::{ffi::CStr, slice};
 
 /// Opaque pointer to a `wasmer_runtime::Instance` value in Rust.
@@ -214,9 +214,10 @@ pub unsafe extern "C" fn vm_exported_function_names(
 /// C API function, works with raw object pointers.
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
-pub unsafe extern "C" fn vm_exec_instance_destroy(instance: *mut vm_exec_instance_t) {
-    if !instance.is_null() {
-        std::ptr::drop_in_place(instance);
+pub unsafe extern "C" fn vm_exec_instance_destroy(instance_ptr: *mut vm_exec_instance_t) {
+    if !instance_ptr.is_null() {
+        let instance = Box::from_raw(instance_ptr as *mut CapiInstance);
+        drop(instance);
     }
 }
 

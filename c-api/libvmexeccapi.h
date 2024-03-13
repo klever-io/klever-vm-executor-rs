@@ -41,29 +41,18 @@ typedef struct {
   int64_t (*get_gas_left_func_ptr)(void *context);
   void (*get_sc_address_func_ptr)(void *context, int32_t result_offset);
   void (*get_owner_address_func_ptr)(void *context, int32_t result_offset);
-  int32_t (*get_shard_of_address_func_ptr)(void *context, int32_t address_offset);
   int32_t (*is_smart_contract_func_ptr)(void *context, int32_t address_offset);
   void (*signal_error_func_ptr)(void *context, int32_t message_offset, int32_t message_length);
   void (*get_external_balance_func_ptr)(void *context, int32_t address_offset, int32_t result_offset);
   int32_t (*get_block_hash_func_ptr)(void *context, int64_t nonce, int32_t result_offset);
-  int32_t (*get_esdt_balance_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce, int32_t result_offset);
-  int32_t (*get_esdt_nft_name_length_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce);
-  int32_t (*get_esdt_nft_attribute_length_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce);
-  int32_t (*get_esdt_nft_uri_length_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce);
-  int32_t (*get_esdt_token_data_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce, int32_t value_handle, int32_t properties_offset, int32_t hash_offset, int32_t name_offset, int32_t attributes_offset, int32_t creator_offset, int32_t royalties_handle, int32_t uris_offset);
-  int64_t (*get_esdt_local_roles_func_ptr)(void *context, int32_t token_id_handle);
+  int32_t (*get_kda_balance_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce, int32_t result_offset);
+  int32_t (*get_kda_nft_name_length_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce);
+  int32_t (*get_kda_nft_uri_length_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce);
+  int32_t (*get_kda_token_data_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce, int32_t precision_handle, int32_t id_offset, int32_t name_offset, int32_t creator_offset, int32_t logo_offset, int32_t initial_supply_offset, int32_t circulating_supply_offset, int32_t max_supply_offset, int32_t minted_offset, int32_t burned_offset, int32_t royalties_offset, int32_t properties_offset, int32_t attributes_offset, int32_t roles_offset);
   int32_t (*validate_token_identifier_func_ptr)(void *context, int32_t token_id_handle);
-  int32_t (*transfer_value_func_ptr)(void *context, int32_t dest_offset, int32_t value_offset, int32_t data_offset, int32_t length);
-  int32_t (*transfer_value_execute_func_ptr)(void *context, int32_t dest_offset, int32_t value_offset, int64_t gas_limit, int32_t function_offset, int32_t function_length, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
-  int32_t (*transfer_esdt_execute_func_ptr)(void *context, int32_t dest_offset, int32_t token_id_offset, int32_t token_id_len, int32_t value_offset, int64_t gas_limit, int32_t function_offset, int32_t function_length, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
-  int32_t (*transfer_esdt_nft_execute_func_ptr)(void *context, int32_t dest_offset, int32_t token_id_offset, int32_t token_id_len, int32_t value_offset, int64_t nonce, int64_t gas_limit, int32_t function_offset, int32_t function_length, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
-  int32_t (*multi_transfer_esdt_nft_execute_func_ptr)(void *context, int32_t dest_offset, int32_t num_token_transfers, int32_t token_transfers_args_length_offset, int32_t token_transfer_data_offset, int64_t gas_limit, int32_t function_offset, int32_t function_length, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
-  int32_t (*create_async_call_func_ptr)(void *context, int32_t dest_offset, int32_t value_offset, int32_t data_offset, int32_t data_length, int32_t success_offset, int32_t success_length, int32_t error_offset, int32_t error_length, int64_t gas, int64_t extra_gas_for_callback);
-  int32_t (*set_async_context_callback_func_ptr)(void *context, int32_t callback, int32_t callback_length, int32_t data, int32_t data_length, int64_t gas);
   void (*upgrade_contract_func_ptr)(void *context, int32_t dest_offset, int64_t gas_limit, int32_t value_offset, int32_t code_offset, int32_t code_metadata_offset, int32_t length, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
   void (*upgrade_from_source_contract_func_ptr)(void *context, int32_t dest_offset, int64_t gas_limit, int32_t value_offset, int32_t source_contract_address_offset, int32_t code_metadata_offset, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
   void (*delete_contract_func_ptr)(void *context, int32_t dest_offset, int64_t gas_limit, int32_t num_arguments, int32_t arguments_length_offset, int32_t data_offset);
-  void (*async_call_func_ptr)(void *context, int32_t dest_offset, int32_t value_offset, int32_t data_offset, int32_t length);
   int32_t (*get_argument_length_func_ptr)(void *context, int32_t id);
   int32_t (*get_argument_func_ptr)(void *context, int32_t id, int32_t arg_offset);
   int32_t (*get_function_func_ptr)(void *context, int32_t function_offset);
@@ -79,16 +68,16 @@ typedef struct {
   void (*get_caller_func_ptr)(void *context, int32_t result_offset);
   void (*check_no_payment_func_ptr)(void *context);
   int32_t (*get_call_value_func_ptr)(void *context, int32_t result_offset);
-  int32_t (*get_esdt_value_func_ptr)(void *context, int32_t result_offset);
-  int32_t (*get_esdt_value_by_index_func_ptr)(void *context, int32_t result_offset, int32_t index);
-  int32_t (*get_esdt_token_name_func_ptr)(void *context, int32_t result_offset);
-  int32_t (*get_esdt_token_name_by_index_func_ptr)(void *context, int32_t result_offset, int32_t index);
-  int64_t (*get_esdt_token_nonce_func_ptr)(void *context);
-  int64_t (*get_esdt_token_nonce_by_index_func_ptr)(void *context, int32_t index);
-  int64_t (*get_current_esdt_nft_nonce_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len);
-  int32_t (*get_esdt_token_type_func_ptr)(void *context);
-  int32_t (*get_esdt_token_type_by_index_func_ptr)(void *context, int32_t index);
-  int32_t (*get_num_esdt_transfers_func_ptr)(void *context);
+  int32_t (*get_kda_value_func_ptr)(void *context, int32_t result_offset);
+  int32_t (*get_kda_value_by_index_func_ptr)(void *context, int32_t result_offset, int32_t index);
+  int32_t (*get_kda_token_name_func_ptr)(void *context, int32_t result_offset);
+  int32_t (*get_kda_token_name_by_index_func_ptr)(void *context, int32_t result_offset, int32_t index);
+  int64_t (*get_kda_token_nonce_func_ptr)(void *context);
+  int64_t (*get_kda_token_nonce_by_index_func_ptr)(void *context, int32_t index);
+  int32_t (*get_kda_token_type_func_ptr)(void *context);
+  int32_t (*get_kda_token_type_by_index_func_ptr)(void *context, int32_t index);
+  int32_t (*get_num_kda_transfers_func_ptr)(void *context);
+  int32_t (*get_call_value_by_token_name_func_ptr)(void *context, int32_t call_value_offset, int32_t token_name_offset, int32_t token_name_length);
   int32_t (*get_call_value_token_name_func_ptr)(void *context, int32_t call_value_offset, int32_t token_name_offset);
   int32_t (*get_call_value_token_name_by_index_func_ptr)(void *context, int32_t call_value_offset, int32_t token_name_offset, int32_t index);
   void (*write_log_func_ptr)(void *context, int32_t data_pointer, int32_t data_length, int32_t topic_ptr, int32_t num_topics);
@@ -128,13 +117,13 @@ typedef struct {
   void (*managed_get_block_random_seed_func_ptr)(void *context, int32_t result_handle);
   void (*managed_get_prev_block_random_seed_func_ptr)(void *context, int32_t result_handle);
   void (*managed_get_return_data_func_ptr)(void *context, int32_t result_id, int32_t result_handle);
-  void (*managed_get_multi_esdt_call_value_func_ptr)(void *context, int32_t multi_call_value_handle);
-  void (*managed_get_back_transfers_func_ptr)(void *context, int32_t esdt_transfers_value_handle, int32_t call_value_handle);
-  void (*managed_get_esdt_balance_func_ptr)(void *context, int32_t address_handle, int32_t token_id_handle, int64_t nonce, int32_t value_handle);
-  void (*managed_get_esdt_token_data_func_ptr)(void *context, int32_t address_handle, int32_t token_id_handle, int64_t nonce, int32_t value_handle, int32_t properties_handle, int32_t hash_handle, int32_t name_handle, int32_t attributes_handle, int32_t creator_handle, int32_t royalties_handle, int32_t uris_handle);
-  void (*managed_async_call_func_ptr)(void *context, int32_t dest_handle, int32_t value_handle, int32_t function_handle, int32_t arguments_handle);
-  int32_t (*managed_create_async_call_func_ptr)(void *context, int32_t dest_handle, int32_t value_handle, int32_t function_handle, int32_t arguments_handle, int32_t success_offset, int32_t success_length, int32_t error_offset, int32_t error_length, int64_t gas, int64_t extra_gas_for_callback, int32_t callback_closure_handle);
-  void (*managed_get_callback_closure_func_ptr)(void *context, int32_t callback_closure_handle);
+  void (*managed_get_kda_call_value_func_ptr)(void *context, int32_t kda_call_value_handle, int32_t kda_handle);
+  void (*managed_get_multi_kda_call_value_func_ptr)(void *context, int32_t multi_call_value_handle);
+  void (*managed_get_back_transfers_func_ptr)(void *context, int32_t kda_transfers_value_handle, int32_t call_value_handle);
+  void (*managed_get_kda_balance_func_ptr)(void *context, int32_t address_handle, int32_t token_id_handle, int64_t nonce, int32_t value_handle);
+  void (*managed_get_user_kda_func_ptr)(void *context, int32_t address_handle, int32_t ticker_handle, int64_t nonce, int32_t balance_handle, int32_t frozen_handle, int32_t last_claim_handle, int32_t buckets_handle, int32_t mime_handle, int32_t metadata_handle);
+  void (*managed_get_kda_token_data_func_ptr)(void *context, int32_t address_handle, int32_t ticker_handle, int64_t nonce, int32_t precision_handle, int32_t id_handle, int32_t name_handle, int32_t creator_handle, int32_t logo_handle, int32_t uris_handle, int32_t initial_supply_handle, int32_t circulating_supply_handle, int32_t max_supply_handle, int32_t minted_handle, int32_t burned_handle, int32_t royalties_handle, int32_t properties_handle, int32_t attributes_handle, int32_t roles_handle, int32_t issue_date_handle);
+  void (*managed_get_kda_roles_func_ptr)(void *context, int32_t ticker_handle, int32_t roles_handle);
   void (*managed_upgrade_from_source_contract_func_ptr)(void *context, int32_t dest_handle, int64_t gas, int32_t value_handle, int32_t address_handle, int32_t code_metadata_handle, int32_t arguments_handle, int32_t result_handle);
   void (*managed_upgrade_contract_func_ptr)(void *context, int32_t dest_handle, int64_t gas, int32_t value_handle, int32_t code_handle, int32_t code_metadata_handle, int32_t arguments_handle, int32_t result_handle);
   void (*managed_delete_contract_func_ptr)(void *context, int32_t dest_handle, int64_t gas_limit, int32_t arguments_handle);
@@ -143,11 +132,7 @@ typedef struct {
   int32_t (*managed_execute_read_only_func_ptr)(void *context, int64_t gas, int32_t address_handle, int32_t function_handle, int32_t arguments_handle, int32_t result_handle);
   int32_t (*managed_execute_on_same_context_func_ptr)(void *context, int64_t gas, int32_t address_handle, int32_t value_handle, int32_t function_handle, int32_t arguments_handle, int32_t result_handle);
   int32_t (*managed_execute_on_dest_context_func_ptr)(void *context, int64_t gas, int32_t address_handle, int32_t value_handle, int32_t function_handle, int32_t arguments_handle, int32_t result_handle);
-  int32_t (*managed_multi_transfer_esdt_nft_execute_func_ptr)(void *context, int32_t dst_handle, int32_t token_transfers_handle, int64_t gas_limit, int32_t function_handle, int32_t arguments_handle);
-  int32_t (*managed_transfer_value_execute_func_ptr)(void *context, int32_t dst_handle, int32_t value_handle, int64_t gas_limit, int32_t function_handle, int32_t arguments_handle);
-  int32_t (*managed_is_esdt_frozen_func_ptr)(void *context, int32_t address_handle, int32_t token_id_handle, int64_t nonce);
-  int32_t (*managed_is_esdt_limited_transfer_func_ptr)(void *context, int32_t token_id_handle);
-  int32_t (*managed_is_esdt_paused_func_ptr)(void *context, int32_t token_id_handle);
+  int32_t (*managed_multi_transfer_kda_nft_execute_func_ptr)(void *context, int32_t dst_handle, int32_t token_transfers_handle, int64_t gas_limit, int32_t function_handle, int32_t arguments_handle);
   void (*managed_buffer_to_hex_func_ptr)(void *context, int32_t source_handle, int32_t dest_handle);
   void (*managed_get_code_metadata_func_ptr)(void *context, int32_t address_handle, int32_t response_handle);
   int32_t (*managed_is_builtin_function_func_ptr)(void *context, int32_t function_name_handle);
@@ -178,10 +163,10 @@ typedef struct {
   int32_t (*big_int_storage_store_unsigned_func_ptr)(void *context, int32_t key_offset, int32_t key_length, int32_t source_handle);
   int32_t (*big_int_storage_load_unsigned_func_ptr)(void *context, int32_t key_offset, int32_t key_length, int32_t destination_handle);
   void (*big_int_get_call_value_func_ptr)(void *context, int32_t destination_handle);
-  void (*big_int_get_esdt_call_value_func_ptr)(void *context, int32_t destination);
-  void (*big_int_get_esdt_call_value_by_index_func_ptr)(void *context, int32_t destination_handle, int32_t index);
+  void (*big_int_get_kda_call_value_func_ptr)(void *context, int32_t destination);
+  void (*big_int_get_kda_call_value_by_index_func_ptr)(void *context, int32_t destination_handle, int32_t index);
   void (*big_int_get_external_balance_func_ptr)(void *context, int32_t address_offset, int32_t result);
-  void (*big_int_get_esdt_external_balance_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce, int32_t result_handle);
+  void (*big_int_get_kda_external_balance_func_ptr)(void *context, int32_t address_offset, int32_t token_id_offset, int32_t token_id_len, int64_t nonce, int32_t result_handle);
   int32_t (*big_int_new_func_ptr)(void *context, int64_t small_value);
   int32_t (*big_int_unsigned_byte_length_func_ptr)(void *context, int32_t reference_handle);
   int32_t (*big_int_signed_byte_length_func_ptr)(void *context, int32_t reference_handle);
@@ -317,7 +302,7 @@ vm_exec_result_t vm_check_signatures(vm_exec_instance_t *instance_ptr);
  *
  * C API function, works with raw object pointers.
  */
-void vm_exec_executor_destroy(vm_exec_executor_t *executor);
+void vm_exec_executor_destroy(vm_exec_executor_t *executor_ptr);
 
 /**
  * Sets the data that can be hold by an instance context.
@@ -380,7 +365,7 @@ vm_exec_result_t vm_exec_instance_call(vm_exec_instance_t *instance_ptr, const c
  *
  * C API function, works with raw object pointers.
  */
-void vm_exec_instance_destroy(vm_exec_instance_t *instance);
+void vm_exec_instance_destroy(vm_exec_instance_t *instance_ptr);
 
 /**
  * Creates a new VM executor instance from cache.

@@ -5,3 +5,4 @@ members = [
     "vm-executor",
     "vm-executor-wasmer",
 ]
+resolver = "2"
