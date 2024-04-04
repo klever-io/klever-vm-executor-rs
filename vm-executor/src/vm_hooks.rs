@@ -98,6 +98,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_get_kda_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32);
     fn managed_get_user_kda(&self, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32);
     fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32);
+    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, max_supply_handle: i32, circulation_supply_handle: i32, meta_handle: i32);
     fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32);
     fn managed_upgrade_from_source_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, address_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32);
     fn managed_upgrade_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, code_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32);
@@ -652,6 +653,10 @@ impl VMHooks for VMHooksDefault {
 
     fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32) {
         println!("Called: managed_get_kda_token_data");
+    }
+
+    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, max_supply_handle: i32, circulation_supply_handle: i32, meta_handle: i32) {
+        println!("Called: managed_get_sft_metadata");
     }
 
     fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32) {

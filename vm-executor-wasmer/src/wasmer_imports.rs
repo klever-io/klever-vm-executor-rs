@@ -436,6 +436,11 @@ fn wasmer_import_managed_get_kda_token_data(env: &VMHooksWrapper, address_handle
 }
 
 #[rustfmt::skip]
+fn wasmer_import_managed_get_sft_metadata(env: &VMHooksWrapper, ticker_handle: i32, nonce: i64, max_supply_handle: i32, circulation_supply_handle: i32, meta_handle: i32) {
+    env.vm_hooks.managed_get_sft_metadata(ticker_handle, nonce, max_supply_handle, circulation_supply_handle, meta_handle)
+}
+
+#[rustfmt::skip]
 fn wasmer_import_managed_get_kda_roles(env: &VMHooksWrapper, ticker_handle: i32, roles_handle: i32) {
     env.vm_hooks.managed_get_kda_roles(ticker_handle, roles_handle)
 }
@@ -1298,6 +1303,7 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "managedGetKDABalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_balance),
             "managedGetUserKDA" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_user_kda),
             "managedGetKDATokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_token_data),
+            "managedGetSftMetadata" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_sft_metadata),
             "managedGetKDARoles" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_roles),
             "managedUpgradeFromSourceContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_upgrade_from_source_contract),
             "managedUpgradeContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_upgrade_contract),

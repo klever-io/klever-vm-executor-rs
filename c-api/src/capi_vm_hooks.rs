@@ -379,6 +379,10 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_get_kda_token_data_func_ptr)(self.vm_hooks_ptr, address_handle, ticker_handle, nonce, precision_handle, id_handle, name_handle, creator_handle, logo_handle, uris_handle, initial_supply_handle, circulating_supply_handle, max_supply_handle, minted_handle, burned_handle, royalties_handle, properties_handle, attributes_handle, roles_handle, issue_date_handle)
     }
 
+    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, max_supply_handle: i32, circulation_supply_handle: i32, meta_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_sft_metadata_func_ptr)(self.vm_hooks_ptr, ticker_handle, nonce, max_supply_handle, circulation_supply_handle, meta_handle)
+    }
+
     fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32) {
         (self.c_func_pointers_ptr.managed_get_kda_roles_func_ptr)(self.vm_hooks_ptr, ticker_handle, roles_handle)
     }
