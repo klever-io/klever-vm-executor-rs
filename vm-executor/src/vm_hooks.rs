@@ -98,7 +98,6 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_get_kda_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32);
     fn managed_get_user_kda(&self, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32);
     fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32);
-    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, max_supply_handle: i32, circulation_supply_handle: i32, meta_handle: i32);
     fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32);
     fn managed_upgrade_from_source_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, address_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32);
     fn managed_upgrade_contract(&self, dest_handle: i32, gas: i64, value_handle: i32, code_handle: i32, code_metadata_handle: i32, arguments_handle: i32, result_handle: i32);
@@ -112,6 +111,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32);
     fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32);
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32;
+    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, data_handle: i32);
     fn big_float_new_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> i32;
     fn big_float_new_from_frac(&self, numerator: i64, denominator: i64) -> i32;
     fn big_float_new_from_sci(&self, significand: i64, exponent: i64) -> i32;
@@ -655,10 +655,6 @@ impl VMHooks for VMHooksDefault {
         println!("Called: managed_get_kda_token_data");
     }
 
-    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, max_supply_handle: i32, circulation_supply_handle: i32, meta_handle: i32) {
-        println!("Called: managed_get_sft_metadata");
-    }
-
     fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32) {
         println!("Called: managed_get_kda_roles");
     }
@@ -716,6 +712,10 @@ impl VMHooks for VMHooksDefault {
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {
         println!("Called: managed_is_builtin_function");
         0
+    }
+
+    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, data_handle: i32) {
+        println!("Called: managed_get_sft_metadata");
     }
 
     fn big_float_new_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> i32 {

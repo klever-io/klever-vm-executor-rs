@@ -123,7 +123,6 @@ typedef struct {
   void (*managed_get_kda_balance_func_ptr)(void *context, int32_t address_handle, int32_t token_id_handle, int64_t nonce, int32_t value_handle);
   void (*managed_get_user_kda_func_ptr)(void *context, int32_t address_handle, int32_t ticker_handle, int64_t nonce, int32_t balance_handle, int32_t frozen_handle, int32_t last_claim_handle, int32_t buckets_handle, int32_t mime_handle, int32_t metadata_handle);
   void (*managed_get_kda_token_data_func_ptr)(void *context, int32_t address_handle, int32_t ticker_handle, int64_t nonce, int32_t precision_handle, int32_t id_handle, int32_t name_handle, int32_t creator_handle, int32_t logo_handle, int32_t uris_handle, int32_t initial_supply_handle, int32_t circulating_supply_handle, int32_t max_supply_handle, int32_t minted_handle, int32_t burned_handle, int32_t royalties_handle, int32_t properties_handle, int32_t attributes_handle, int32_t roles_handle, int32_t issue_date_handle);
-  void (*managed_get_sft_metadata_func_ptr)(void *context, int32_t ticker_handle, int64_t nonce, int32_t max_supply_handle, int32_t circulation_supply_handle, int32_t meta_handle);
   void (*managed_get_kda_roles_func_ptr)(void *context, int32_t ticker_handle, int32_t roles_handle);
   void (*managed_upgrade_from_source_contract_func_ptr)(void *context, int32_t dest_handle, int64_t gas, int32_t value_handle, int32_t address_handle, int32_t code_metadata_handle, int32_t arguments_handle, int32_t result_handle);
   void (*managed_upgrade_contract_func_ptr)(void *context, int32_t dest_handle, int64_t gas, int32_t value_handle, int32_t code_handle, int32_t code_metadata_handle, int32_t arguments_handle, int32_t result_handle);
@@ -137,6 +136,7 @@ typedef struct {
   void (*managed_buffer_to_hex_func_ptr)(void *context, int32_t source_handle, int32_t dest_handle);
   void (*managed_get_code_metadata_func_ptr)(void *context, int32_t address_handle, int32_t response_handle);
   int32_t (*managed_is_builtin_function_func_ptr)(void *context, int32_t function_name_handle);
+  void (*managed_get_sft_metadata_func_ptr)(void *context, int32_t ticker_handle, int64_t nonce, int32_t data_handle);
   int32_t (*big_float_new_from_parts_func_ptr)(void *context, int32_t integral_part, int32_t fractional_part, int32_t exponent);
   int32_t (*big_float_new_from_frac_func_ptr)(void *context, int64_t numerator, int64_t denominator);
   int32_t (*big_float_new_from_sci_func_ptr)(void *context, int64_t significand, int64_t exponent);
