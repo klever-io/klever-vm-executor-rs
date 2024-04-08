@@ -431,6 +431,10 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_is_builtin_function_func_ptr)(self.vm_hooks_ptr, function_name_handle)
     }
 
+    fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, data_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_sft_metadata_func_ptr)(self.vm_hooks_ptr, ticker_handle, nonce, data_handle)
+    }
+
     fn big_float_new_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> i32 {
         (self.c_func_pointers_ptr.big_float_new_from_parts_func_ptr)(self.vm_hooks_ptr, integral_part, fractional_part, exponent)
     }
