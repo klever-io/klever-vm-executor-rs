@@ -375,8 +375,8 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_get_user_kda_func_ptr)(self.vm_hooks_ptr, address_handle, ticker_handle, nonce, balance_handle, frozen_handle, last_claim_handle, buckets_handle, mime_handle, metadata_handle)
     }
 
-    fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32) {
-        (self.c_func_pointers_ptr.managed_get_kda_token_data_func_ptr)(self.vm_hooks_ptr, address_handle, ticker_handle, nonce, precision_handle, id_handle, name_handle, creator_handle, logo_handle, uris_handle, initial_supply_handle, circulating_supply_handle, max_supply_handle, minted_handle, burned_handle, royalties_handle, properties_handle, attributes_handle, roles_handle, issue_date_handle)
+    fn managed_get_kda_token_data(&self, address_handle: i32, ticker_handle: i32, nonce: i64, precision_handle: i32, id_handle: i32, name_handle: i32, creator_handle: i32, admin_handle: i32, logo_handle: i32, uris_handle: i32, initial_supply_handle: i32, circulating_supply_handle: i32, max_supply_handle: i32, minted_handle: i32, burned_handle: i32, royalties_handle: i32, properties_handle: i32, attributes_handle: i32, roles_handle: i32, issue_date_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_kda_token_data_func_ptr)(self.vm_hooks_ptr, address_handle, ticker_handle, nonce, precision_handle, id_handle, name_handle, creator_handle, admin_handle, logo_handle, uris_handle, initial_supply_handle, circulating_supply_handle, max_supply_handle, minted_handle, burned_handle, royalties_handle, properties_handle, attributes_handle, roles_handle, issue_date_handle)
     }
 
     fn managed_get_kda_roles(&self, ticker_handle: i32, roles_handle: i32) {

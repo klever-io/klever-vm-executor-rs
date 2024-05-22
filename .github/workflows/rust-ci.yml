@@ -12,11 +12,11 @@ jobs:
     name: Rust tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           default: true
-          toolchain: stable
+          toolchain: 1.77.1
       - name: Run rust tests
         run: cargo test
   clippy_check:
@@ -24,10 +24,10 @@ jobs:
     name: Clippy linter check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.77.1
           components: clippy
           default: true
       - uses: actions-rs/clippy-check@v1

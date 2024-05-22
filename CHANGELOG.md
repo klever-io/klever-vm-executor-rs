@@ -2,6 +2,10 @@
 
 This file contains a centralizes a trace of all published crate versions, with their changes in short.
 
+## [klever-chain-vm-executor 0.2.2] - 2024-05-22
+
+- Add admin address to `managed_get_kda_token_data`.
+
 ## [klever-chain-vm-executor 0.2.1] - 2024-04-04
 
 - New VM hook: `managedGetSftMetadata`.
