@@ -32,6 +32,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          toolchain: 1.77.1
       - name: Add tragets
         run: |
           rustup target add aarch64-unknown-linux-gnu
