@@ -351,11 +351,6 @@ fn wasmer_import_get_current_tx_hash(env: &VMHooksWrapper, data_offset: i32) {
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_prev_tx_hash(env: &VMHooksWrapper, data_offset: i32) {
-    env.vm_hooks.get_prev_tx_hash(env.convert_mem_ptr(data_offset))
-}
-
-#[rustfmt::skip]
 fn wasmer_import_managed_sc_address(env: &VMHooksWrapper, destination_handle: i32) {
     env.vm_hooks.managed_sc_address(destination_handle)
 }
@@ -1286,7 +1281,6 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "deleteFromReturnData" => Function::new_native_with_env(store, env.clone(), wasmer_import_delete_from_return_data),
             "getOriginalTxHash" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_original_tx_hash),
             "getCurrentTxHash" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_current_tx_hash),
-            "getPrevTxHash" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_prev_tx_hash),
             "managedSCAddress" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_sc_address),
             "managedOwnerAddress" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_owner_address),
             "managedCaller" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_caller),

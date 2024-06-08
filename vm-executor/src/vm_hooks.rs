@@ -81,7 +81,6 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn delete_from_return_data(&self, result_id: i32);
     fn get_original_tx_hash(&self, data_offset: MemPtr);
     fn get_current_tx_hash(&self, data_offset: MemPtr);
-    fn get_prev_tx_hash(&self, data_offset: MemPtr);
     fn managed_sc_address(&self, destination_handle: i32);
     fn managed_owner_address(&self, destination_handle: i32);
     fn managed_caller(&self, destination_handle: i32);
@@ -585,10 +584,6 @@ impl VMHooks for VMHooksDefault {
 
     fn get_current_tx_hash(&self, data_offset: MemPtr) {
         println!("Called: get_current_tx_hash");
-    }
-
-    fn get_prev_tx_hash(&self, data_offset: MemPtr) {
-        println!("Called: get_prev_tx_hash");
     }
 
     fn managed_sc_address(&self, destination_handle: i32) {

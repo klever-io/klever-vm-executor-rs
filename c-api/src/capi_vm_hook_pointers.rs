@@ -78,7 +78,6 @@ pub struct vm_exec_vm_hook_c_func_pointers {
     pub delete_from_return_data_func_ptr: extern "C" fn(context: *mut c_void, result_id: i32),
     pub get_original_tx_hash_func_ptr: extern "C" fn(context: *mut c_void, data_offset: i32),
     pub get_current_tx_hash_func_ptr: extern "C" fn(context: *mut c_void, data_offset: i32),
-    pub get_prev_tx_hash_func_ptr: extern "C" fn(context: *mut c_void, data_offset: i32),
     pub managed_sc_address_func_ptr: extern "C" fn(context: *mut c_void, destination_handle: i32),
     pub managed_owner_address_func_ptr: extern "C" fn(context: *mut c_void, destination_handle: i32),
     pub managed_caller_func_ptr: extern "C" fn(context: *mut c_void, destination_handle: i32),

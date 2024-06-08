@@ -311,10 +311,6 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.get_current_tx_hash_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(data_offset))
     }
 
-    fn get_prev_tx_hash(&self, data_offset: MemPtr) {
-        (self.c_func_pointers_ptr.get_prev_tx_hash_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(data_offset))
-    }
-
     fn managed_sc_address(&self, destination_handle: i32) {
         (self.c_func_pointers_ptr.managed_sc_address_func_ptr)(self.vm_hooks_ptr, destination_handle)
     }
