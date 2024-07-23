@@ -501,8 +501,8 @@ fn wasmer_import_managed_get_sft_metadata(env: &VMHooksWrapper, ticker_handle: i
 }
 
 #[rustfmt::skip]
-fn wasmer_import_managed_acc_has_perm(env: &VMHooksWrapper, threshold: i64, weight: i64, source_acc_addr: i32, target_acc_addr: i32, perm_type: i32, ops: i32, res_handle: i32) {
-    env.vm_hooks.managed_acc_has_perm(threshold, weight, source_acc_addr, target_acc_addr, perm_type, ops, res_handle)
+fn wasmer_import_managed_acc_has_perm(env: &VMHooksWrapper, threshold: i64, source_acc_addr: i32, target_acc_addr: i32, res_handle: i32) {
+    env.vm_hooks.managed_acc_has_perm(threshold, source_acc_addr, target_acc_addr, res_handle)
 }
 
 #[rustfmt::skip]

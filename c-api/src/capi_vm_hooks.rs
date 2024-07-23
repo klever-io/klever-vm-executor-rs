@@ -431,8 +431,8 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_get_sft_metadata_func_ptr)(self.vm_hooks_ptr, ticker_handle, nonce, data_handle)
     }
 
-    fn managed_acc_has_perm(&self, threshold: i64, weight: i64, source_acc_addr: i32, target_acc_addr: i32, perm_type: i32, ops: i32, res_handle: i32) {
-        (self.c_func_pointers_ptr.managed_acc_has_perm_func_ptr)(self.vm_hooks_ptr, threshold, weight, source_acc_addr, target_acc_addr, perm_type, ops, res_handle)
+    fn managed_acc_has_perm(&self, threshold: i64, source_acc_addr: i32, target_acc_addr: i32, res_handle: i32) {
+        (self.c_func_pointers_ptr.managed_acc_has_perm_func_ptr)(self.vm_hooks_ptr, threshold, source_acc_addr, target_acc_addr, res_handle)
     }
 
     fn big_float_new_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> i32 {
