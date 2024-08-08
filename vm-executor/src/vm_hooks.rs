@@ -111,6 +111,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32);
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32;
     fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, data_handle: i32);
+    fn managed_acc_has_perm(&self, ops: i64, source_acc_addr: i32, target_acc_addr: i32) -> i32;
     fn big_float_new_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> i32;
     fn big_float_new_from_frac(&self, numerator: i64, denominator: i64) -> i32;
     fn big_float_new_from_sci(&self, significand: i64, exponent: i64) -> i32;
@@ -711,6 +712,11 @@ impl VMHooks for VMHooksDefault {
 
     fn managed_get_sft_metadata(&self, ticker_handle: i32, nonce: i64, data_handle: i32) {
         println!("Called: managed_get_sft_metadata");
+    }
+
+    fn managed_acc_has_perm(&self, ops: i64, source_acc_addr: i32, target_acc_addr: i32) -> i32 {
+        println!("Called: managed_acc_has_perm");
+        0
     }
 
     fn big_float_new_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> i32 {
