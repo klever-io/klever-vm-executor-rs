@@ -21,7 +21,8 @@ jobs:
             platform: amd64
             artifact_name: libvmexeccapi.so
             make_target: capi-linux-amd64
-          - os: macos-14
+          - os: macos-13
+            # github actions does not support amd64 on macos-14
             platform: amd64
             artifact_name: libvmexeccapi.dylib
             make_target: capi-osx-amd64
