@@ -12,6 +12,7 @@ use klever_chain_vm_executor::{MemLength, MemPtr};
 
 use std::cell::RefCell;
 use std::{rc::Rc, sync::Arc};
+use std::panic::AssertUnwindSafe;
 use wasmer::Universal;
 use wasmer::{CompilerConfig, Extern, Module, Store};
 use wasmer::{Pages, Singlepass};
@@ -39,7 +40,15 @@ impl WasmerInstance {
         let store = Store::new(&Universal::new(compiler).engine());
 
         trace!("Compiling module ...");
-        let module = Module::new(&store, wasm_bytes)?;
+        let result = std::panic::catch_unwind(AssertUnwindSafe(|| {
+            Module::new(&store, wasm_bytes)
+        }));
+
+        let module = match result {
+            Ok(Ok(module)) => module,
+            Ok(Err(err)) => return Err(Box::new(err)),
+            Err(_) => return Err(Box::new(ServiceError::new("module compilation panicked"))),
+        };
 
         // Create an empty import object.
         trace!("Generating imports ...");
