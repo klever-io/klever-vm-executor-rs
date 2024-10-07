@@ -10,7 +10,7 @@ mod common;
 
 #[test]
 fn instance_endpoints_empty() {
-    let instance = common::test_instance(common::EMPTY_SC_WAT);
+    let instance = common::test_instance(common::EMPTY_SC_WAT).unwrap();
     assert_eq!(
         instance.get_exported_function_names(),
         vec!["init", "callBack"]
@@ -19,7 +19,7 @@ fn instance_endpoints_empty() {
 
 #[test]
 fn instance_endpoints_adder() {
-    let instance = common::test_instance(common::ADDER_WAT);
+    let instance = common::test_instance(common::ADDER_WAT).unwrap();
     assert!(instance.has_function("add"));
     assert!(!instance.has_function("missingEndpoint"));
     assert_eq!(
@@ -29,14 +29,22 @@ fn instance_endpoints_adder() {
 }
 
 #[test]
+fn capture_module_compilation_panics() {
+    let result = common::test_instance(common::UNSUPPORTED_OPERATIONS);
+    assert!(result.is_err());
+    let error = result.err().unwrap();
+    assert_eq!(error.to_string(), "module compilation panicked");
+}
+
+#[test]
 fn bad_init_param() {
-    let instance = common::test_instance(common::BAD_INIT_PARAM);
+    let instance = common::test_instance(common::BAD_INIT_PARAM).unwrap();
     assert!(!instance.check_signatures());
 }
 
 #[test]
 fn bad_init_result() {
-    let instance = common::test_instance(common::BAD_INIT_RESULT);
+    let instance = common::test_instance(common::BAD_INIT_RESULT).unwrap();
     assert!(!instance.check_signatures());
 }
 
