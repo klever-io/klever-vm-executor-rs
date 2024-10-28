@@ -18,11 +18,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn get_owner_address(&self, result_offset: MemPtr);
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32;
     fn signal_error(&self, message_offset: MemPtr, message_length: MemLength);
-    fn get_external_balance(&self, address_offset: MemPtr, result_offset: MemPtr);
-    fn get_block_hash(&self, nonce: i64, result_offset: MemPtr) -> i32;
     fn get_kda_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32;
-    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
-    fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
     fn get_kda_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, precision_handle: i32, id_offset: MemPtr, name_offset: MemPtr, creator_offset: MemPtr, logo_offset: MemPtr, initial_supply_offset: MemPtr, circulating_supply_offset: MemPtr, max_supply_offset: MemPtr, minted_offset: MemPtr, burned_offset: MemPtr, royalties_offset: MemPtr, properties_offset: MemPtr, attributes_offset: MemPtr, roles_offset: MemPtr) -> i32;
     fn validate_token_identifier(&self, token_id_handle: i32) -> i32;
     fn upgrade_contract(&self, dest_offset: MemPtr, gas_limit: i64, value_offset: MemPtr, code_offset: MemPtr, code_metadata_offset: MemPtr, length: MemLength, num_arguments: i32, arguments_length_offset: MemPtr, data_offset: MemPtr);
@@ -288,27 +284,8 @@ impl VMHooks for VMHooksDefault {
         println!("Called: signal_error");
     }
 
-    fn get_external_balance(&self, address_offset: MemPtr, result_offset: MemPtr) {
-        println!("Called: get_external_balance");
-    }
-
-    fn get_block_hash(&self, nonce: i64, result_offset: MemPtr) -> i32 {
-        println!("Called: get_block_hash");
-        0
-    }
-
     fn get_kda_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32 {
         println!("Called: get_kda_balance");
-        0
-    }
-
-    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        println!("Called: get_kda_nft_name_length");
-        0
-    }
-
-    fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        println!("Called: get_kda_nft_uri_length");
         0
     }
 

@@ -36,28 +36,8 @@ fn wasmer_import_signal_error(env: &VMHooksWrapper, message_offset: i32, message
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_external_balance(env: &VMHooksWrapper, address_offset: i32, result_offset: i32) {
-    env.vm_hooks.get_external_balance(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(result_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_get_block_hash(env: &VMHooksWrapper, nonce: i64, result_offset: i32) -> i32 {
-    env.vm_hooks.get_block_hash(nonce, env.convert_mem_ptr(result_offset))
-}
-
-#[rustfmt::skip]
 fn wasmer_import_get_kda_balance(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, result_offset: i32) -> i32 {
     env.vm_hooks.get_kda_balance(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce, env.convert_mem_ptr(result_offset))
-}
-
-#[rustfmt::skip]
-fn wasmer_import_get_kda_nft_name_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
-    env.vm_hooks.get_kda_nft_name_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
-}
-
-#[rustfmt::skip]
-fn wasmer_import_get_kda_nft_uri_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
-    env.vm_hooks.get_kda_nft_uri_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
 }
 
 #[rustfmt::skip]
@@ -1223,11 +1203,7 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "getOwnerAddress" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_owner_address),
             "isSmartContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_is_smart_contract),
             "signalError" => Function::new_native_with_env(store, env.clone(), wasmer_import_signal_error),
-            "getExternalBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_external_balance),
-            "getBlockHash" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_block_hash),
             "getKDABalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_balance),
-            "getKDANFTNameLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_nft_name_length),
-            "getKDANFTURILength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_nft_uri_length),
             "getKDATokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_data),
             "validateTokenIdentifier" => Function::new_native_with_env(store, env.clone(), wasmer_import_validate_token_identifier),
             "upgradeContract" => Function::new_native_with_env(store, env.clone(), wasmer_import_upgrade_contract),
