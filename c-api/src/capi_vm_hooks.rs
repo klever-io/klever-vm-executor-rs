@@ -359,6 +359,10 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.managed_get_multi_kda_call_value_func_ptr)(self.vm_hooks_ptr, multi_call_value_handle)
     }
 
+    fn managed_get_multi_kda_without_klv_call_value(&self, multi_call_value_handle: i32) {
+        (self.c_func_pointers_ptr.managed_get_multi_kda_without_klv_call_value_func_ptr)(self.vm_hooks_ptr, multi_call_value_handle)
+    }
+
     fn managed_get_back_transfers(&self, kda_transfers_value_handle: i32, call_value_handle: i32) {
         (self.c_func_pointers_ptr.managed_get_back_transfers_func_ptr)(self.vm_hooks_ptr, kda_transfers_value_handle, call_value_handle)
     }
