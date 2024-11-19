@@ -90,6 +90,7 @@ pub struct vm_exec_vm_hook_c_func_pointers {
     pub managed_get_return_data_func_ptr: extern "C" fn(context: *mut c_void, result_id: i32, result_handle: i32),
     pub managed_get_kda_call_value_func_ptr: extern "C" fn(context: *mut c_void, kda_call_value_handle: i32, kda_handle: i32),
     pub managed_get_multi_kda_call_value_func_ptr: extern "C" fn(context: *mut c_void, multi_call_value_handle: i32),
+    pub managed_get_multi_kda_without_klv_call_value_func_ptr: extern "C" fn(context: *mut c_void, multi_call_value_handle: i32),
     pub managed_get_back_transfers_func_ptr: extern "C" fn(context: *mut c_void, kda_transfers_value_handle: i32, call_value_handle: i32),
     pub managed_get_kda_balance_func_ptr: extern "C" fn(context: *mut c_void, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32),
     pub managed_get_user_kda_func_ptr: extern "C" fn(context: *mut c_void, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32),

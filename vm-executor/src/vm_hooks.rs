@@ -93,6 +93,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn managed_get_return_data(&self, result_id: i32, result_handle: i32);
     fn managed_get_kda_call_value(&self, kda_call_value_handle: i32, kda_handle: i32);
     fn managed_get_multi_kda_call_value(&self, multi_call_value_handle: i32);
+    fn managed_get_multi_kda_without_klv_call_value(&self, multi_call_value_handle: i32);
     fn managed_get_back_transfers(&self, kda_transfers_value_handle: i32, call_value_handle: i32);
     fn managed_get_kda_balance(&self, address_handle: i32, token_id_handle: i32, nonce: i64, value_handle: i32);
     fn managed_get_user_kda(&self, address_handle: i32, ticker_handle: i32, nonce: i64, balance_handle: i32, frozen_handle: i32, last_claim_handle: i32, buckets_handle: i32, mime_handle: i32, metadata_handle: i32);
@@ -633,6 +634,10 @@ impl VMHooks for VMHooksDefault {
 
     fn managed_get_multi_kda_call_value(&self, multi_call_value_handle: i32) {
         println!("Called: managed_get_multi_kda_call_value");
+    }
+
+    fn managed_get_multi_kda_without_klv_call_value(&self, multi_call_value_handle: i32) {
+        println!("Called: managed_get_multi_kda_without_klv_call_value");
     }
 
     fn managed_get_back_transfers(&self, kda_transfers_value_handle: i32, call_value_handle: i32) {

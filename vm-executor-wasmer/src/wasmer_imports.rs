@@ -411,6 +411,11 @@ fn wasmer_import_managed_get_multi_kda_call_value(env: &VMHooksWrapper, multi_ca
 }
 
 #[rustfmt::skip]
+fn wasmer_import_managed_get_multi_kda_without_klv_call_value(env: &VMHooksWrapper, multi_call_value_handle: i32) {
+    env.vm_hooks.managed_get_multi_kda_without_klv_call_value(multi_call_value_handle)
+}
+
+#[rustfmt::skip]
 fn wasmer_import_managed_get_back_transfers(env: &VMHooksWrapper, kda_transfers_value_handle: i32, call_value_handle: i32) {
     env.vm_hooks.managed_get_back_transfers(kda_transfers_value_handle, call_value_handle)
 }
@@ -1298,6 +1303,7 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "managedGetReturnData" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_return_data),
             "managedGetKDACallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_call_value),
             "managedGetMultiKDACallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_multi_kda_call_value),
+            "managedGetMultiKDAWithoutKLVCallValue" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_multi_kda_without_klv_call_value),
             "managedGetBackTransfers" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_back_transfers),
             "managedGetKDABalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_kda_balance),
             "managedGetUserKDA" => Function::new_native_with_env(store, env.clone(), wasmer_import_managed_get_user_kda),
