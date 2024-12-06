@@ -42,3 +42,6 @@ clean:
 	rm target/release/libvmexeccapi.dylib
 	rm target/release/libvmexeccapi_arm.dylib
 	rm c-api/libvmexeccapi.h
+
+docker-build-arm:
+	docker buildx build --platform linux/arm64/v8 -t libvm_arm -f Docker/arm64.dockerfile .
