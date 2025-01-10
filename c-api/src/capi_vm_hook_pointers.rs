@@ -19,7 +19,7 @@ pub struct vm_exec_vm_hook_c_func_pointers {
     pub get_block_hash_func_ptr: extern "C" fn(context: *mut c_void, nonce: i64, result_offset: i32) -> i32,
     pub get_kda_balance_func_ptr: extern "C" fn(context: *mut c_void, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, result_offset: i32) -> i32,
     pub get_kda_name_length_func_ptr: extern "C" fn(context: *mut c_void, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32,
-    pub get_kda_nft_uri_length_func_ptr: extern "C" fn(context: *mut c_void, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32,
+    pub get_kda_uri_length_func_ptr: extern "C" fn(context: *mut c_void, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32,
     pub get_kda_token_data_func_ptr: extern "C" fn(context: *mut c_void, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64, precision_handle: i32, id_offset: i32, name_offset: i32, creator_offset: i32, logo_offset: i32, initial_supply_offset: i32, circulating_supply_offset: i32, max_supply_offset: i32, minted_offset: i32, burned_offset: i32, royalties_offset: i32, properties_offset: i32, attributes_offset: i32, roles_offset: i32) -> i32,
     pub validate_token_identifier_func_ptr: extern "C" fn(context: *mut c_void, token_id_handle: i32) -> i32,
     pub upgrade_contract_func_ptr: extern "C" fn(context: *mut c_void, dest_offset: i32, gas_limit: i64, value_offset: i32, code_offset: i32, code_metadata_offset: i32, length: i32, num_arguments: i32, arguments_length_offset: i32, data_offset: i32),
