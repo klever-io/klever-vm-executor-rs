@@ -51,8 +51,8 @@ fn wasmer_import_get_kda_balance(env: &VMHooksWrapper, address_offset: i32, toke
 }
 
 #[rustfmt::skip]
-fn wasmer_import_get_kda_nft_name_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
-    env.vm_hooks.get_kda_nft_name_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
+fn wasmer_import_get_kda_name_length(env: &VMHooksWrapper, address_offset: i32, token_id_offset: i32, token_id_len: i32, nonce: i64) -> i32 {
+    env.vm_hooks.get_kda_name_length(env.convert_mem_ptr(address_offset), env.convert_mem_ptr(token_id_offset), env.convert_mem_length(token_id_len), nonce)
 }
 
 #[rustfmt::skip]
@@ -1231,7 +1231,7 @@ pub fn generate_import_object(store: &Store, env: &VMHooksWrapper) -> ImportObje
             "getExternalBalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_external_balance),
             "getBlockHash" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_block_hash),
             "getKDABalance" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_balance),
-            "getKDANFTNameLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_nft_name_length),
+            "getKDANameLength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_name_length),
             "getKDANFTURILength" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_nft_uri_length),
             "getKDATokenData" => Function::new_native_with_env(store, env.clone(), wasmer_import_get_kda_token_data),
             "validateTokenIdentifier" => Function::new_native_with_env(store, env.clone(), wasmer_import_validate_token_identifier),

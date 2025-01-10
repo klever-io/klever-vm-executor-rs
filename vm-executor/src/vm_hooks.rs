@@ -21,7 +21,7 @@ pub trait VMHooks: core::fmt::Debug + 'static {
     fn get_external_balance(&self, address_offset: MemPtr, result_offset: MemPtr);
     fn get_block_hash(&self, nonce: i64, result_offset: MemPtr) -> i32;
     fn get_kda_balance(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, result_offset: MemPtr) -> i32;
-    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
+    fn get_kda_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
     fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32;
     fn get_kda_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, precision_handle: i32, id_offset: MemPtr, name_offset: MemPtr, creator_offset: MemPtr, logo_offset: MemPtr, initial_supply_offset: MemPtr, circulating_supply_offset: MemPtr, max_supply_offset: MemPtr, minted_offset: MemPtr, burned_offset: MemPtr, royalties_offset: MemPtr, properties_offset: MemPtr, attributes_offset: MemPtr, roles_offset: MemPtr) -> i32;
     fn validate_token_identifier(&self, token_id_handle: i32) -> i32;
@@ -303,8 +303,8 @@ impl VMHooks for VMHooksDefault {
         0
     }
 
-    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        println!("Called: get_kda_nft_name_length");
+    fn get_kda_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        println!("Called: get_kda_name_length");
         0
     }
 
