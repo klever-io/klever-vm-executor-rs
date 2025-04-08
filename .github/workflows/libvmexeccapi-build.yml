@@ -46,8 +46,9 @@ jobs:
       - name: Save artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: libs
+          name: libs-${{ matrix.os }}-${{ matrix.platform }}
           path: |
             target/release/*.so
             target/release/*.dylib
             c-api/libvmexeccapi.h
+          if-no-files-found: error
