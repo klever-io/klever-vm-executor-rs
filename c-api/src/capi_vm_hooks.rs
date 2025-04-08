@@ -71,12 +71,12 @@ impl klever_chain_vm_executor::VMHooks for CapiVMHooks {
         (self.c_func_pointers_ptr.get_kda_balance_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce, self.convert_mem_ptr(result_offset))
     }
 
-    fn get_kda_nft_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        (self.c_func_pointers_ptr.get_kda_nft_name_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
+    fn get_kda_name_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_name_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
     }
 
-    fn get_kda_nft_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
-        (self.c_func_pointers_ptr.get_kda_nft_uri_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
+    fn get_kda_uri_length(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64) -> i32 {
+        (self.c_func_pointers_ptr.get_kda_uri_length_func_ptr)(self.vm_hooks_ptr, self.convert_mem_ptr(address_offset), self.convert_mem_ptr(token_id_offset), self.convert_mem_length(token_id_len), nonce)
     }
 
     fn get_kda_token_data(&self, address_offset: MemPtr, token_id_offset: MemPtr, token_id_len: MemLength, nonce: i64, precision_handle: i32, id_offset: MemPtr, name_offset: MemPtr, creator_offset: MemPtr, logo_offset: MemPtr, initial_supply_offset: MemPtr, circulating_supply_offset: MemPtr, max_supply_offset: MemPtr, minted_offset: MemPtr, burned_offset: MemPtr, royalties_offset: MemPtr, properties_offset: MemPtr, attributes_offset: MemPtr, roles_offset: MemPtr) -> i32 {
