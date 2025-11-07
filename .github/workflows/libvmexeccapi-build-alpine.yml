@@ -1,0 +1,61 @@
+name: libvmexeccapi-build-alpine
+
+on:
+  push:
+    branches:
+      - master
+      - klever
+  pull_request:
+
+jobs:
+  build:
+    name: Build musl library for ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            artifact_name: libvmexeccapi-musl.so
+            artifact_suffix: amd64
+          - platform: linux/arm64
+            artifact_name: libvmexeccapi_arm-musl.so
+            artifact_suffix: arm64
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          platforms: ${{ matrix.platform }}
+          file: ./Docker/alpine.dockerfile
+          tags: alpine-builder-${{ matrix.artifact_suffix }}
+
+      - name: Extract library from Docker image
+        run: |
+          mkdir -p output
+          docker run --platform="${{ matrix.platform }}" --rm alpine-builder-${{ matrix.artifact_suffix }} cat /data/${{ matrix.artifact_name }} > $GITHUB_WORKSPACE/${{ matrix.artifact_name }}
+          # Validate the file exists and is not empty
+          if [ ! -s "$GITHUB_WORKSPACE/${{ matrix.artifact_name }}" ]; then
+            echo "Error: Library file is missing or empty"
+            exit 1
+          fi
+          echo "Library extracted successfully: ${{ matrix.artifact_name }} ($(stat -c%z "$GITHUB_WORKSPACE/${{ matrix.artifact_name }}" 2>/dev/null || stat -c%s "$GITHUB_WORKSPACE/${{ matrix.artifact_name }}") bytes)"
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-alpine-${{ matrix.artifact_suffix }}-${{ github.sha }}
+          path: |
+            ${{ matrix.artifact_name }}
+          if-no-files-found: error
