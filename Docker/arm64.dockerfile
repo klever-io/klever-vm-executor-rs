@@ -1,4 +1,4 @@
-FROM arm64v8/rust:1.81
+FROM arm64v8/rust:1.88
 
 RUN apt-get update && apt-get install -y \
     wget \
