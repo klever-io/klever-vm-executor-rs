@@ -221,6 +221,20 @@ pub unsafe extern "C" fn vm_exec_instance_destroy(instance_ptr: *mut vm_exec_ins
     }
 }
 
+/// Returns the largest declared table maximum of an instance.
+///
+/// # Safety
+///
+/// C API function, works with raw object pointers.
+#[allow(clippy::cast_ptr_alignment)]
+#[no_mangle]
+pub unsafe extern "C" fn vm_exec_instance_max_declared_table_size(
+    instance_ptr: *mut vm_exec_instance_t,
+) -> u32 {
+    let capi_instance = cast_input_ptr!(instance_ptr, CapiInstance, "instance ptr is null", 0);
+    capi_instance.content.max_declared_table_size()
+}
+
 /// Resets an instance, cleaning memories and globals.
 ///
 /// # Safety

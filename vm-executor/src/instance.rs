@@ -1,10 +1,12 @@
 use crate::{BreakpointValue, ExecutorError};
 
+#[repr(C)]
 pub struct CompilationOptions {
     pub gas_limit: u64,
     pub unmetered_locals: usize,
     pub max_memory_grow: usize,
     pub max_memory_grow_delta: usize,
+    pub max_declared_table_size: usize,
     pub opcode_trace: bool,
     pub metering: bool,
     pub runtime_breakpoints: bool,
@@ -64,4 +66,7 @@ pub trait Instance {
 
     /// Caches an instance.
     fn cache(&self) -> Result<Vec<u8>, String>;
+
+    /// Returns the largest declared table maximum of an instance.
+    fn max_declared_table_size(&self) -> u32;
 }
