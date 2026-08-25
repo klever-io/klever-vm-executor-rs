@@ -50,6 +50,8 @@ impl WasmerInstance {
             Err(_) => return Err(Box::new(ServiceError::new("module compilation panicked"))),
         };
 
+        validate_tables(&module, compilation_options.max_declared_table_size)?;
+
         // Create an empty import object.
         trace!("Generating imports ...");
         let vm_hooks_wrapper = VMHooksWrapper {
@@ -98,6 +100,8 @@ impl WasmerInstance {
         unsafe {
             module = Module::deserialize(&store, cache_bytes)?;
         };
+
+        validate_tables(&module, compilation_options.max_declared_table_size)?;
 
         // Create an empty import object.
         trace!("Generating imports ...");
@@ -174,6 +178,31 @@ fn validate_memory(memory: &wasmer::Memory) -> Result<(), ExecutorError> {
         return Err(Box::new(ServiceError::new(
             "memory size exceeds maximum allowed",
         )));
+    }
+
+    Ok(())
+}
+
+fn validate_tables(module: &Module, max_declared_table_size: usize) -> Result<(), ExecutorError> {
+    if max_declared_table_size == usize::MAX {
+        return Ok(());
+    }
+
+    for table_type in module.info().tables.values() {
+        let exceeds_cap = match table_type.maximum {
+            None => true,
+            Some(declared_max) => (declared_max as usize) > max_declared_table_size,
+        };
+        if exceeds_cap {
+            trace!(
+                "Declared table size exceeds maximum allowed: {:#?} > {:#?}",
+                table_type.maximum,
+                max_declared_table_size
+            );
+            return Err(Box::new(ServiceError::new(
+                "declared table size exceeds maximum allowed",
+            )));
+        }
     }
 
     Ok(())
@@ -358,5 +387,16 @@ impl Instance for WasmerInstance {
             Ok(bytes) => Ok(bytes),
             Err(err) => Err(err.to_string()),
         }
+    }
+
+    fn max_declared_table_size(&self) -> u32 {
+        self.wasmer_instance
+            .module()
+            .info()
+            .tables
+            .values()
+            .map(|table_type| table_type.maximum.unwrap_or(u32::MAX))
+            .max()
+            .unwrap_or(0)
     }
 }
