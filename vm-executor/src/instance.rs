@@ -10,6 +10,9 @@ pub struct CompilationOptions {
     pub opcode_trace: bool,
     pub metering: bool,
     pub runtime_breakpoints: bool,
+    /// Per-element `table.init` cost; `0` charges the flat opcode cost only.
+    /// Keep last: the C API casts this struct by pointer.
+    pub table_init_per_element_cost: u64,
 }
 
 /// The argument type for dealing with executor memory pointers.

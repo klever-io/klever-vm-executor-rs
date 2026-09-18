@@ -11,6 +11,7 @@ pub const DUMMY_COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     opcode_trace: false,
     metering: false,
     runtime_breakpoints: false,
+    table_init_per_element_cost: 0,
 };
 
 pub fn test_instance(wat: &str) -> Result<Box<dyn Instance>, ExecutorError> {

@@ -62,6 +62,10 @@ impl WasmerInstance {
         trace!("Instantiating WasmerInstance ...");
         let wasmer_instance = wasmer::Instance::new(&module, &import_object)?;
         set_points_limit(&wasmer_instance, compilation_options.gas_limit)?;
+        set_table_init_per_element_cost(
+            &wasmer_instance,
+            compilation_options.table_init_per_element_cost,
+        )?;
 
         // Check that there is exactly one memory in the smart contract, no more, no less
         let memories = get_memories(&wasmer_instance);
@@ -113,6 +117,10 @@ impl WasmerInstance {
         trace!("Instantiating WasmerInstance ...");
         let wasmer_instance = wasmer::Instance::new(&module, &import_object)?;
         set_points_limit(&wasmer_instance, compilation_options.gas_limit)?;
+        set_table_init_per_element_cost(
+            &wasmer_instance,
+            compilation_options.table_init_per_element_cost,
+        )?;
 
         // Check that there is exactly one memory in the smart contract, no more, no less
         let memories = get_memories(&wasmer_instance);
@@ -227,6 +235,7 @@ fn push_middlewares(
     let metering_middleware = Arc::new(Metering::new(
         compilation_options.gas_limit,
         compilation_options.unmetered_locals,
+        compilation_options.table_init_per_element_cost,
         executor_data.borrow().get_opcode_cost(),
         breakpoints_middleware.clone(),
     ));

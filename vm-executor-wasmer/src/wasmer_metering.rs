@@ -16,18 +16,23 @@ use wasmer_types::{GlobalIndex, ModuleInfo};
 
 const METERING_POINTS_LIMIT: &str = "metering_points_limit";
 const METERING_POINTS_USED: &str = "metering_points_used";
+const METERING_TABLE_INIT_PER_ELEMENT: &str = "metering_table_init_per_element";
+const METERING_TABLE_INIT_ELEMENT_COUNT: &str = "metering_table_init_element_count";
 const MAX_LOCAL_COUNT: u32 = 4000;
 
 #[derive(Clone, Debug, MemoryUsage)]
 struct MeteringGlobalIndexes {
     points_limit_global_index: GlobalIndex,
     points_used_global_index: GlobalIndex,
+    table_init_per_element_global_index: GlobalIndex,
+    table_init_element_count_global_index: GlobalIndex,
 }
 
 #[derive(Debug)]
 pub(crate) struct Metering {
     points_limit: u64,
     unmetered_locals: usize,
+    table_init_per_element_cost: u64,
     opcode_cost: Arc<Mutex<OpcodeCost>>,
     breakpoints_middleware: Arc<Breakpoints>,
     global_indexes: Mutex<Option<MeteringGlobalIndexes>>,
@@ -37,12 +42,14 @@ impl Metering {
     pub(crate) fn new(
         points_limit: u64,
         unmetered_locals: usize,
+        table_init_per_element_cost: u64,
         opcode_cost: Arc<Mutex<OpcodeCost>>,
         breakpoints_middleware: Arc<Breakpoints>,
     ) -> Self {
         Self {
             points_limit,
             unmetered_locals,
+            table_init_per_element_cost,
             opcode_cost,
             breakpoints_middleware,
             global_indexes: Mutex::new(None),
@@ -65,6 +72,24 @@ impl Metering {
             .as_ref()
             .unwrap()
             .points_used_global_index
+    }
+
+    fn get_table_init_per_element_global_index(&self) -> GlobalIndex {
+        self.global_indexes
+            .lock()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .table_init_per_element_global_index
+    }
+
+    fn get_table_init_element_count_global_index(&self) -> GlobalIndex {
+        self.global_indexes
+            .lock()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .table_init_element_count_global_index
     }
 }
 
@@ -104,6 +129,16 @@ impl ModuleMiddleware for Metering {
                 points_limit,
             ),
             points_used_global_index: create_global_index(module_info, METERING_POINTS_USED, 0),
+            table_init_per_element_global_index: create_global_index(
+                module_info,
+                METERING_TABLE_INIT_PER_ELEMENT,
+                self.table_init_per_element_cost as i64,
+            ),
+            table_init_element_count_global_index: create_global_index(
+                module_info,
+                METERING_TABLE_INIT_ELEMENT_COUNT,
+                0,
+            ),
         });
     }
 }
@@ -113,6 +148,8 @@ impl MiddlewareWithProtectedGlobals for Metering {
         vec![
             self.get_points_limit_global_index().as_u32(),
             self.get_points_used_global_index().as_u32(),
+            self.get_table_init_per_element_global_index().as_u32(),
+            self.get_table_init_element_count_global_index().as_u32(),
         ]
     }
 }
@@ -139,6 +176,42 @@ impl FunctionMetering {
             Operator::GlobalSet {
                 global_index: self.global_indexes.points_used_global_index.as_u32(),
             },
+        ]);
+    }
+
+    fn inject_table_init_element_charge(&self, state: &mut MiddlewareReaderState) {
+        state.extend(&[
+            Operator::I64ExtendI32U,
+            Operator::GlobalSet {
+                global_index: self.global_indexes.table_init_element_count_global_index.as_u32(),
+            },
+            Operator::GlobalGet {
+                global_index: self.global_indexes.points_used_global_index.as_u32(),
+            },
+            Operator::I64Const {
+                value: self.accumulated_cost as i64,
+            },
+            Operator::I64Add,
+            Operator::GlobalGet {
+                global_index: self.global_indexes.table_init_element_count_global_index.as_u32(),
+            },
+            Operator::GlobalGet {
+                global_index: self.global_indexes.table_init_per_element_global_index.as_u32(),
+            },
+            Operator::I64Mul,
+            Operator::I64Add,
+            Operator::GlobalSet {
+                global_index: self.global_indexes.points_used_global_index.as_u32(),
+            },
+        ]);
+    }
+
+    fn restore_table_init_element_count(&self, state: &mut MiddlewareReaderState) {
+        state.extend(&[
+            Operator::GlobalGet {
+                global_index: self.global_indexes.table_init_element_count_global_index.as_u32(),
+            },
+            Operator::I32WrapI64,
         ]);
     }
 
@@ -177,6 +250,18 @@ impl FunctionMiddleware for FunctionMetering {
             }
         }
 
+        if matches!(operator, Operator::TableInit { .. }) {
+            self.inject_table_init_element_charge(state);
+            self.inject_out_of_gas_check(state);
+            self.restore_table_init_element_count(state);
+
+            self.accumulated_cost = 0;
+
+            state.push_operator(operator);
+
+            return Ok(());
+        }
+
         if is_control_flow_operator(&operator) {
             self.inject_points_used_increment(state);
             self.inject_out_of_gas_check(state);
@@ -209,6 +294,23 @@ pub(crate) fn set_points_limit(instance: &Instance, limit: u64) -> Result<(), St
     match result {
         Ok(global) => {
             let result = global.set(limit.into());
+            match result {
+                Ok(_) => Ok(()),
+                Err(err) => Err(err.message()),
+            }
+        }
+        Err(err) => Err(err.to_string()),
+    }
+}
+
+pub(crate) fn set_table_init_per_element_cost(
+    instance: &Instance,
+    cost: u64,
+) -> Result<(), String> {
+    let result = instance.exports.get_global(METERING_TABLE_INIT_PER_ELEMENT);
+    match result {
+        Ok(global) => {
+            let result = global.set(cost.into());
             match result {
                 Ok(_) => Ok(()),
                 Err(err) => Err(err.message()),
