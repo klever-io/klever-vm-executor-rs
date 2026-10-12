@@ -1,4 +1,4 @@
-FROM rust:1.88-alpine
+FROM rust:1.99.0-alpine
 
 RUN apk add --no-cache \
     musl-dev \

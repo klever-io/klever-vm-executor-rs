@@ -27,6 +27,8 @@ capi-linux-arm: capi
 	mv ${TARGET_DIR}/release/libklever_chain_vm_executor_c_api.so target/release/libvmexeccapi_arm.so
 	patchelf --set-soname libvmexeccapi_arm.so target/release/libvmexeccapi_arm.so
 
+capi-osx-amd64: TARGET = --target x86_64-apple-darwin
+capi-osx-amd64: TARGET_DIR = ./target/x86_64-apple-darwin
 capi-osx-amd64: capi
 	mv ${TARGET_DIR}/release/libklever_chain_vm_executor_c_api.dylib target/release/libvmexeccapi.dylib
 	install_name_tool -id @rpath/libvmexeccapi.dylib target/release/libvmexeccapi.dylib
