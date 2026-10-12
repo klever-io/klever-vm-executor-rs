@@ -1,4 +1,4 @@
-FROM arm64v8/rust:1.88
+FROM arm64v8/rust:1.99.0-bookworm
 
 RUN apt-get update && apt-get install -y \
     wget \

@@ -7,33 +7,36 @@ on:
       - klever
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build musl library for ${{ matrix.platform }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
         include:
           - platform: linux/amd64
+            runner: ubuntu-latest
             artifact_name: libvmexeccapi-musl.so
             artifact_suffix: amd64
           - platform: linux/arm64
+            runner: ubuntu-24.04-arm
             artifact_name: libvmexeccapi_arm-musl.so
             artifact_suffix: arm64
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: "0"
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+          persist-credentials: false
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           load: true
@@ -53,7 +56,7 @@ jobs:
           echo "Library extracted successfully: ${{ matrix.artifact_name }} ($(stat -c%z "$GITHUB_WORKSPACE/${{ matrix.artifact_name }}" 2>/dev/null || stat -c%s "$GITHUB_WORKSPACE/${{ matrix.artifact_name }}") bytes)"
 
       - name: Save artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: libs-alpine-${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: |
