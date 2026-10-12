@@ -7,22 +7,28 @@ on:
       - klever
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   rust_test:
     name: Rust tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Setup toolchain
         run: rustup default 1.99.0
       - name: Run rust tests
         run: cargo test
   clippy_check:
-    permissions: write-all
     name: Clippy linter check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Setup toolchain
         run: |
           rustup default 1.99.0

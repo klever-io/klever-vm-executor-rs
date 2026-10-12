@@ -6,7 +6,9 @@ on:
       - master
       - klever
   pull_request:
-  
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -17,6 +19,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: "0"
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
