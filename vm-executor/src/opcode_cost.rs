@@ -4,6 +4,7 @@
 // !!!!!!!!!!!!!!!!!!!!!! AUTO-GENERATED FILE !!!!!!!!!!!!!!!!!!!!!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#[repr(C)]
 #[derive(Clone, Debug, Default)]
 pub struct OpcodeCost {
     pub opcode_block: u32,
@@ -124,11 +125,6 @@ pub struct OpcodeCost {
     pub opcode_returncall: u32,
     pub opcode_returncallindirect: u32,
     pub opcode_select: u32,
-    pub opcode_tableget: u32,
-    pub opcode_tablegrow: u32,
-    pub opcode_tableinit: u32,
-    pub opcode_tableset: u32,
-    pub opcode_tablesize: u32,
     pub opcode_throw: u32,
     pub opcode_try: u32,
     pub opcode_typedselect: u32,
