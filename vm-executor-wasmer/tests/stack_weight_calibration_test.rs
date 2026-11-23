@@ -305,7 +305,9 @@ fn min_stack_size(instance: &dyn Instance, estimate: usize) -> Option<usize> {
     }
     let mut low = SEARCH_FLOOR;
     while high - low > SEARCH_STEP {
-        let mid = (low + high) / 2 / SEARCH_STEP * SEARCH_STEP;
+        // `low` is on the grid but `high` may not be: never round `mid` down to `low`,
+        // so every probe shrinks the bracket.
+        let mid = ((low + high) / 2 / SEARCH_STEP * SEARCH_STEP).max(low + SEARCH_STEP);
         match call_on_stack(instance, mid).0 {
             Ok(()) => high = mid,
             Err(err) => {
