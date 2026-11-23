@@ -774,7 +774,7 @@ fn write_stack_depth_stats(instance: &Instance, stats: StackDepthStats) {
 /// Marks `instance` active on this thread for the lifetime of the guard and sets its
 /// counters for the call: zero for a top-level call, or the counters of the innermost
 /// active instance plus one level and `NESTED_CALL_OVERHEAD_WEIGHT` for a nested call.
-pub(crate) fn enter_stack_depth_call(instance: &Instance) -> StackDepthCallGuard {
+pub(crate) fn enter_stack_depth_call(instance: &Instance) -> StackDepthCallGuard<'_> {
     let stack_address = current_stack_address();
 
     // No borrow of ACTIVE_INSTANCES is held while globals are read or written, nor
@@ -822,7 +822,7 @@ pub(crate) fn enter_stack_depth_call(instance: &Instance) -> StackDepthCallGuard
         .flatten();
 
     StackDepthCallGuard {
-        instance: instance.clone(),
+        instance,
         stack_len,
         restore_on_exit,
     }
@@ -840,15 +840,21 @@ fn is_same_instance(a: &Instance, b: &Instance) -> bool {
 
 /// Pops the instance pushed by `enter_stack_depth_call` when dropped, also when the
 /// call fails or panics. Never panics itself.
-pub(crate) struct StackDepthCallGuard {
-    instance: Instance,
+///
+/// The guard borrows the instance instead of owning a clone. When the Go node abandons
+/// the call's frames after a host panic, the guard is never dropped, and an owned clone
+/// would keep the whole instance (its 6 GiB memory reservation included) alive for the
+/// life of the process. The only owned reference is the entry in `ACTIVE_INSTANCES`,
+/// which the next call on the same thread drops (`drop_abandoned_calls`).
+pub(crate) struct StackDepthCallGuard<'a> {
+    instance: &'a Instance,
     /// Length of the active stack before the push; `None` if the push failed.
     stack_len: Option<usize>,
     /// Counters of the outer call still running on the same instance, to restore on exit.
     restore_on_exit: Option<StackDepthStats>,
 }
 
-impl Drop for StackDepthCallGuard {
+impl Drop for StackDepthCallGuard<'_> {
     fn drop(&mut self) {
         if let Some(stack_len) = self.stack_len {
             let _ = ACTIVE_INSTANCES.try_with(|active| {
@@ -859,9 +865,9 @@ impl Drop for StackDepthCallGuard {
         }
 
         if let Some(outer_stats) = self.restore_on_exit {
-            let nested_stats = read_stack_depth_stats(&self.instance).unwrap_or_default();
+            let nested_stats = read_stack_depth_stats(self.instance).unwrap_or_default();
             write_stack_depth_stats(
-                &self.instance,
+                self.instance,
                 StackDepthStats {
                     depth_current: outer_stats.depth_current,
                     depth_max: outer_stats.depth_max.max(nested_stats.depth_max),
@@ -923,7 +929,10 @@ fn record_function_locals(local_count: u64) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wasmer::{imports, CompilerConfig, Singlepass, Store, Target, Universal};
+    use std::sync::Arc;
+    use wasmer::{
+        imports, CompilerConfig, Function, Singlepass, Store, Target, Universal, WasmerEnv,
+    };
 
     fn singlepass_features() -> Features {
         Singlepass::default().default_features_for_target(&Target::default())
@@ -1142,6 +1151,39 @@ mod tests {
         Instance::new(&module, &imports! {}).unwrap()
     }
 
+    /// Host import environment holding a clone of a sentinel: the instance keeps the
+    /// clone alive exactly as long as the instance itself is alive.
+    #[derive(Clone)]
+    struct Sentinel(#[allow(dead_code)] Arc<()>);
+
+    impl WasmerEnv for Sentinel {}
+
+    fn sentinel_import(_: &Sentinel) {}
+
+    /// Like `counters_instance`, with one host import holding a clone of `sentinel`.
+    fn sentinel_instance(sentinel: &Arc<()>) -> Instance {
+        let wat = format!(
+            r#"(module
+                (import "env" "sentinel" (func))
+                (global (export "{STACK_DEPTH_CURRENT}") (mut i64) (i64.const 0))
+                (global (export "{STACK_DEPTH_MAX}") (mut i64) (i64.const 0))
+                (global (export "{STACK_WEIGHT_CURRENT}") (mut i64) (i64.const 0))
+                (global (export "{STACK_WEIGHT_MAX}") (mut i64) (i64.const 0)))"#
+        );
+        let store = Store::new(&Universal::new(Singlepass::default()).engine());
+        let module = Module::new(&store, wat).unwrap();
+        let import_object = imports! {
+            "env" => {
+                "sentinel" => Function::new_native_with_env(
+                    &store,
+                    Sentinel(sentinel.clone()),
+                    sentinel_import,
+                ),
+            },
+        };
+        Instance::new(&module, &import_object).unwrap()
+    }
+
     fn active_call_count() -> usize {
         ACTIVE_INSTANCES.with(|active| active.borrow().len())
     }
@@ -1156,7 +1198,7 @@ mod tests {
     }
 
     #[inline(never)]
-    fn enter_further_down(instance: &Instance) -> StackDepthCallGuard {
+    fn enter_further_down(instance: &Instance) -> StackDepthCallGuard<'_> {
         let padding = [0u8; 4096];
         std::hint::black_box(&padding);
         enter_stack_depth_call(instance)
@@ -1187,6 +1229,28 @@ mod tests {
         assert_eq!(active_call_count(), 1);
         drop(guard);
         assert_eq!(active_call_count(), 0);
+    }
+
+    #[test]
+    fn an_abandoned_call_does_not_keep_its_instance_alive() {
+        let sentinel = Arc::new(());
+        let abandoned = sentinel_instance(&sentinel);
+        assert_eq!(Arc::strong_count(&sentinel), 2, "the instance holds the sentinel");
+
+        abandon_call_further_down(&abandoned);
+        drop(abandoned);
+        // The only reference left is the abandoned entry in ACTIVE_INSTANCES, which the
+        // next call on this thread drops: at most one per thread.
+        assert_eq!(active_call_count(), 1);
+
+        let next = counters_instance();
+        drop(enter_stack_depth_call(&next));
+        assert_eq!(active_call_count(), 0);
+        assert_eq!(
+            Arc::strong_count(&sentinel),
+            1,
+            "the abandoned call still keeps its instance alive"
+        );
     }
 
     #[test]
