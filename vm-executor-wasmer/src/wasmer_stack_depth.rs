@@ -78,10 +78,7 @@
 
 use crate::wasmer_breakpoints::BREAKPOINT_VALUE;
 use crate::wasmer_helpers::{create_global_index, MiddlewareWithProtectedGlobals};
-use crate::wasmer_metering::{
-    METERING_POINTS_LIMIT, METERING_POINTS_USED, METERING_TABLE_INIT_ELEMENT_COUNT,
-    METERING_TABLE_INIT_PER_ELEMENT,
-};
+use crate::wasmer_metering::{METERING_POINTS_LIMIT, METERING_POINTS_USED};
 use crate::wasmer_opcode_control::{
     OPCODE_CONTROL_MEMORY_GROW_COUNT, OPCODE_CONTROL_OPERAND_BACKUP,
 };
@@ -164,11 +161,9 @@ pub(crate) const RESERVED_EXPORT_NAMES: [&str; 4] = [
 
 /// The export names of the globals the metering, breakpoints and opcode control
 /// middlewares inject. A collision with one of them is only logged, in record mode.
-pub(crate) const LEGACY_INJECTED_GLOBAL_NAMES: [&str; 7] = [
+pub(crate) const LEGACY_INJECTED_GLOBAL_NAMES: [&str; 5] = [
     METERING_POINTS_LIMIT,
     METERING_POINTS_USED,
-    METERING_TABLE_INIT_PER_ELEMENT,
-    METERING_TABLE_INIT_ELEMENT_COUNT,
     BREAKPOINT_VALUE,
     OPCODE_CONTROL_MEMORY_GROW_COUNT,
     OPCODE_CONTROL_OPERAND_BACKUP,

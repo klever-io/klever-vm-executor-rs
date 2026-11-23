@@ -1,5 +1,7 @@
 use crate::{BreakpointValue, ExecutorError};
 
+/// Passed by pointer through the C API: klever-go builds the same layout and checks
+/// its size against `vm_exec_compilation_options_size` at startup.
 #[repr(C)]
 pub struct CompilationOptions {
     pub gas_limit: u64,
@@ -10,9 +12,6 @@ pub struct CompilationOptions {
     pub opcode_trace: bool,
     pub metering: bool,
     pub runtime_breakpoints: bool,
-    /// Per-element `table.init` cost; `0` charges the flat opcode cost only.
-    /// Keep last: the C API casts this struct by pointer.
-    pub table_init_per_element_cost: u64,
 }
 
 /// The argument type for dealing with executor memory pointers.

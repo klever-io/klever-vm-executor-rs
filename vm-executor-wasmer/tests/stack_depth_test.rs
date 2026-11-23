@@ -1067,7 +1067,7 @@ fn exports_with_reserved_names_are_rejected() {
 }
 
 /// A module compiled without the executor's middlewares, as an old executor's cache
-/// would hold it, that still exports the two metering globals instantiation sets.
+/// would hold it, that still exports the metering global instantiation sets.
 fn stale_cache_bytes(with_stack_depth_counters: bool) -> Vec<u8> {
     let counters = if with_stack_depth_counters {
         RESERVED_EXPORT_NAMES
@@ -1081,7 +1081,6 @@ fn stale_cache_bytes(with_stack_depth_counters: bool) -> Vec<u8> {
         r#"
 (module
     (global (export "metering_points_limit") (mut i64) (i64.const 0))
-    (global (export "metering_table_init_per_element") (mut i64) (i64.const 0))
     {counters}
     (func $main)
     (memory 1)
