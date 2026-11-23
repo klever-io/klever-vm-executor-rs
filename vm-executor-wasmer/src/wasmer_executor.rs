@@ -22,7 +22,7 @@ pub(crate) struct WasmerExecutorData {
 }
 
 impl WasmerExecutorData {
-    fn new(vm_hooks: Box<dyn VMHooks>) -> Self {
+    pub(crate) fn new(vm_hooks: Box<dyn VMHooks>) -> Self {
         Self {
             vm_hooks: Rc::new(vm_hooks),
             opcode_cost: Arc::new(Mutex::new(OpcodeCost::default())),

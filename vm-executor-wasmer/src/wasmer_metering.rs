@@ -2,9 +2,10 @@ use crate::wasmer_breakpoints::{Breakpoints, BREAKPOINT_VALUE_OUT_OF_GAS};
 use crate::wasmer_helpers::{
     create_global_index, is_control_flow_operator, MiddlewareWithProtectedGlobals,
 };
-use crate::{get_local_cost, get_opcode_cost};
+use crate::{get_local_cost, get_opcode_cost, REPLAY_RECORD_MODE};
 use loupe::{MemoryUsage, MemoryUsageTracker};
 use klever_chain_vm_executor::OpcodeCost;
+use std::io::Write;
 use std::mem;
 use std::sync::{Arc, Mutex};
 use wasmer::wasmparser::Operator;
@@ -14,11 +15,21 @@ use wasmer::{
 };
 use wasmer_types::{GlobalIndex, ModuleInfo};
 
-const METERING_POINTS_LIMIT: &str = "metering_points_limit";
-const METERING_POINTS_USED: &str = "metering_points_used";
-const METERING_TABLE_INIT_PER_ELEMENT: &str = "metering_table_init_per_element";
-const METERING_TABLE_INIT_ELEMENT_COUNT: &str = "metering_table_init_element_count";
+pub(crate) const METERING_POINTS_LIMIT: &str = "metering_points_limit";
+pub(crate) const METERING_POINTS_USED: &str = "metering_points_used";
+pub(crate) const METERING_TABLE_INIT_PER_ELEMENT: &str = "metering_table_init_per_element";
+pub(crate) const METERING_TABLE_INIT_ELEMENT_COUNT: &str = "metering_table_init_element_count";
 const MAX_LOCAL_COUNT: u32 = 4000;
+
+// KLC-2861: wasmer calls `feed_local_count` once per local declaration group, so the
+// MAX_LOCAL_COUNT check alone can be bypassed by splitting a function's locals into several
+// declarations, and the `unmetered_locals` allowance is granted once per declaration. In the
+// release build (`REPLAY_RECORD_MODE` false) the limit is also enforced on the function's
+// total locals, and locals are charged once per function: the locals beyond
+// `unmetered_locals` in total. In the replay build the total is only recorded (stdout lines
+// `KLC2861_LOCALS` / `KLC2861_GAS`), never enforced, and locals are still charged per
+// declaration, so a replay cannot diverge because of it. The per-declaration limit check is
+// the same in both modes.
 
 #[derive(Clone, Debug, MemoryUsage)]
 struct MeteringGlobalIndexes {
@@ -111,6 +122,10 @@ impl ModuleMiddleware for Metering {
         Box::new(FunctionMetering {
             accumulated_cost: Default::default(),
             unmetered_locals: self.unmetered_locals,
+            total_locals: 0,
+            local_declarations: 0,
+            per_declaration_locals_cost: 0,
+            locals_recorded: false,
             opcode_cost: self.opcode_cost.clone(),
             breakpoints_middleware: self.breakpoints_middleware.clone(),
             global_indexes: self.global_indexes.lock().unwrap().clone().unwrap(),
@@ -158,6 +173,12 @@ impl MiddlewareWithProtectedGlobals for Metering {
 struct FunctionMetering {
     accumulated_cost: u64,
     unmetered_locals: usize,
+    // Locals declared by the function so far, summed over all its declaration groups.
+    total_locals: u32,
+    local_declarations: u32,
+    // Gas charged for locals by the per-declaration formula.
+    per_declaration_locals_cost: u64,
+    locals_recorded: bool,
     opcode_cost: Arc<Mutex<OpcodeCost>>,
     breakpoints_middleware: Arc<Breakpoints>,
     global_indexes: MeteringGlobalIndexes,
@@ -215,6 +236,40 @@ impl FunctionMetering {
         ]);
     }
 
+    // Record-only messages for the replay build: what enforcing the total locals limit and
+    // charging locals once per function would change for this function.
+    fn function_locals_records(&self) -> Vec<String> {
+        let mut records = Vec::new();
+
+        if self.total_locals > MAX_LOCAL_COUNT {
+            records.push(format!(
+                "KLC2861_LOCALS over_limit total={}",
+                self.total_locals
+            ));
+        }
+
+        let per_function_cost = self.per_function_locals_cost(self.total_locals);
+        if per_function_cost != self.per_declaration_locals_cost {
+            records.push(format!(
+                "KLC2861_GAS diff per_declaration={} per_function={} total_locals={} declarations={}",
+                self.per_declaration_locals_cost,
+                per_function_cost,
+                self.total_locals,
+                self.local_declarations
+            ));
+        }
+
+        records
+    }
+
+    // Gas for `total_locals` locals charged once per function: only the locals beyond
+    // `unmetered_locals` in total are metered.
+    fn per_function_locals_cost(&self, total_locals: u32) -> u64 {
+        let metered_locals = (total_locals as u64).saturating_sub(self.unmetered_locals as u64);
+        let local_cost = get_local_cost(&self.opcode_cost.lock().unwrap()) as u64;
+        metered_locals.saturating_mul(local_cost)
+    }
+
     fn inject_out_of_gas_check(&self, state: &mut MiddlewareReaderState) {
         state.extend(&[
             Operator::GlobalGet {
@@ -236,6 +291,15 @@ impl FunctionMiddleware for FunctionMetering {
         operator: Operator<'b>,
         state: &mut MiddlewareReaderState<'b>,
     ) -> Result<(), MiddlewareError> {
+        // All local declarations are fed before the first operator, so the totals are final.
+        if REPLAY_RECORD_MODE && !self.locals_recorded {
+            self.locals_recorded = true;
+            let mut stdout = std::io::stdout().lock();
+            for record in self.function_locals_records() {
+                let _ = writeln!(stdout, "{record}");
+            }
+        }
+
         // Get the cost of the current operator, and add it to the accumulator.
         // This needs to be done before the metering logic, to prevent operators like `Call` from escaping metering in some
         // corner cases.
@@ -277,12 +341,28 @@ impl FunctionMiddleware for FunctionMetering {
     fn feed_local_count(&mut self, count: u32) -> Result<(), MiddlewareError> {
         check_local_count_exceeded(count)?;
 
+        let previous_total_locals = self.total_locals;
+        self.total_locals = self.total_locals.saturating_add(count);
+        self.local_declarations = self.local_declarations.saturating_add(1);
+        if !REPLAY_RECORD_MODE {
+            check_local_count_exceeded(self.total_locals)?;
+
+            // Charge only what this declaration adds to the per-function cost, so the
+            // charge after the last declaration is the cost of the function's total.
+            self.accumulated_cost += self.per_function_locals_cost(self.total_locals)
+                - self.per_function_locals_cost(previous_total_locals);
+            return Ok(());
+        }
+
         let unmetered_locals = self.unmetered_locals as u32;
         if count > unmetered_locals {
             let metered_locals = count - unmetered_locals;
             let local_cost = get_local_cost(&self.opcode_cost.lock().unwrap());
             let metered_locals_cost = metered_locals * local_cost;
             self.accumulated_cost += metered_locals_cost as u64;
+            self.per_declaration_locals_cost = self
+                .per_declaration_locals_cost
+                .saturating_add(metered_locals_cost as u64);
         }
 
         Ok(())
@@ -357,4 +437,141 @@ fn check_local_count_exceeded(count: u32) -> Result<(), MiddlewareError> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn function_metering(unmetered_locals: usize, local_cost: u32) -> FunctionMetering {
+        FunctionMetering {
+            accumulated_cost: 0,
+            unmetered_locals,
+            total_locals: 0,
+            local_declarations: 0,
+            per_declaration_locals_cost: 0,
+            locals_recorded: false,
+            opcode_cost: Arc::new(Mutex::new(OpcodeCost {
+                opcode_localallocate: local_cost,
+                ..Default::default()
+            })),
+            breakpoints_middleware: Arc::new(Breakpoints::new()),
+            global_indexes: MeteringGlobalIndexes {
+                points_limit_global_index: GlobalIndex::from_u32(0),
+                points_used_global_index: GlobalIndex::from_u32(1),
+                table_init_per_element_global_index: GlobalIndex::from_u32(2),
+                table_init_element_count_global_index: GlobalIndex::from_u32(3),
+            },
+        }
+    }
+
+    fn feed_locals(metering: &mut FunctionMetering, groups: &[u32]) -> Result<(), MiddlewareError> {
+        groups
+            .iter()
+            .try_for_each(|count| metering.feed_local_count(*count))
+    }
+
+    #[test]
+    fn total_locals_limit_follows_the_mode() {
+        let result = feed_locals(&mut function_metering(0, 1), &[2000, 2001]);
+        if !REPLAY_RECORD_MODE {
+            // Release: the split declarations are rejected like a single one.
+            let err = result.unwrap_err().to_string();
+            assert!(
+                err.contains("maximum number of locals(4000) exceeded(4001)"),
+                "unexpected error: {err}"
+            );
+        } else {
+            // Replay: accepted, exactly as before the total was tracked.
+            assert!(result.is_ok());
+        }
+    }
+
+    #[test]
+    fn total_locals_at_the_limit_are_accepted_in_both_modes() {
+        assert!(feed_locals(&mut function_metering(0, 1), &[2000, 2000]).is_ok());
+    }
+
+    #[test]
+    fn single_declaration_over_the_limit_is_rejected_in_both_modes() {
+        assert!(feed_locals(&mut function_metering(0, 1), &[4001]).is_err());
+    }
+
+    #[test]
+    fn local_charge_follows_the_mode() {
+        let mut metering = function_metering(100, 10);
+        feed_locals(&mut metering, &[50, 150, 50]).unwrap();
+
+        if !REPLAY_RECORD_MODE {
+            // Release: the 150 locals beyond the 100 unmetered ones in total.
+            assert_eq!(metering.accumulated_cost, 1500);
+        } else {
+            // Replay: 50 metered locals in the one declaration over 100.
+            assert_eq!(metering.accumulated_cost, 500);
+            assert_eq!(metering.per_declaration_locals_cost, 500);
+        }
+        assert_eq!(metering.total_locals, 250);
+        assert_eq!(metering.local_declarations, 3);
+    }
+
+    #[test]
+    fn local_charge_is_the_same_in_both_modes_for_one_declaration() {
+        let mut metering = function_metering(100, 10);
+        feed_locals(&mut metering, &[300]).unwrap();
+        assert_eq!(metering.accumulated_cost, 2000);
+
+        let mut metering = function_metering(100, 10);
+        feed_locals(&mut metering, &[60]).unwrap();
+        assert_eq!(metering.accumulated_cost, 0);
+    }
+
+    #[test]
+    fn records_the_per_function_gas_difference() {
+        if !REPLAY_RECORD_MODE {
+            // The release build tracks no per-declaration charge to compare with.
+            return;
+        }
+        let mut metering = function_metering(100, 10);
+        feed_locals(&mut metering, &[50, 150, 50]).unwrap();
+
+        assert_eq!(
+            metering.function_locals_records(),
+            vec![
+                "KLC2861_GAS diff per_declaration=500 per_function=1500 total_locals=250 declarations=3"
+                    .to_string()
+            ]
+        );
+    }
+
+    #[test]
+    fn records_nothing_when_both_charges_agree() {
+        if !REPLAY_RECORD_MODE {
+            // The release build tracks no per-declaration charge to compare with.
+            return;
+        }
+        let mut metering = function_metering(100, 10);
+        feed_locals(&mut metering, &[300]).unwrap();
+        assert!(metering.function_locals_records().is_empty());
+
+        let mut metering = function_metering(100, 10);
+        feed_locals(&mut metering, &[200, 300]).unwrap();
+        assert_eq!(metering.function_locals_records().len(), 1);
+
+        let mut metering = function_metering(0, 10);
+        feed_locals(&mut metering, &[200, 300]).unwrap();
+        assert!(metering.function_locals_records().is_empty());
+    }
+
+    #[test]
+    fn records_a_total_over_the_limit() {
+        // Set directly: in the release mode feed_local_count rejects this total.
+        let mut metering = function_metering(0, 0);
+        metering.total_locals = 4001;
+        metering.local_declarations = 2;
+
+        assert_eq!(
+            metering.function_locals_records(),
+            vec!["KLC2861_LOCALS over_limit total=4001".to_string()]
+        );
+    }
 }

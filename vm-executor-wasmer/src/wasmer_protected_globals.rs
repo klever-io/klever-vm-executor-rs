@@ -88,3 +88,29 @@ impl FunctionMiddleware for FunctionProtectedGlobals {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A valid module never names an injected global (validation rejects the index), so
+    /// this check is only reachable with an index injected by hand.
+    #[test]
+    fn global_set_on_a_protected_index_is_rejected() {
+        let function = FunctionProtectedGlobals {
+            protected_globals: vec![7, 8],
+        };
+        let err = function
+            .check_protected_globals_invalid_access(&Operator::GlobalSet { global_index: 7 })
+            .unwrap_err();
+        assert!(err.to_string().contains("protected globals invalid access"));
+
+        // Positive control: writes to other globals and reads of protected ones pass.
+        assert!(function
+            .check_protected_globals_invalid_access(&Operator::GlobalSet { global_index: 6 })
+            .is_ok());
+        assert!(function
+            .check_protected_globals_invalid_access(&Operator::GlobalGet { global_index: 7 })
+            .is_ok());
+    }
+}

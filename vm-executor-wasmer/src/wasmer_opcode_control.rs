@@ -15,8 +15,8 @@ use crate::{
     wasmer_helpers::{create_global_index, MiddlewareWithProtectedGlobals},
 };
 
-const OPCODE_CONTROL_MEMORY_GROW_COUNT: &str = "opcode_control_memory_grow_count";
-const OPCODE_CONTROL_OPERAND_BACKUP: &str = "opcode_control_operand_backup";
+pub(crate) const OPCODE_CONTROL_MEMORY_GROW_COUNT: &str = "opcode_control_memory_grow_count";
+pub(crate) const OPCODE_CONTROL_OPERAND_BACKUP: &str = "opcode_control_operand_backup";
 
 #[derive(Clone, Debug, MemoryUsage)]
 struct OpcodeControlGlobalIndexes {

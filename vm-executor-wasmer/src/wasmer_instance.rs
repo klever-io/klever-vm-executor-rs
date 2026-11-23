@@ -1,8 +1,13 @@
 use crate::wasmer_opcode_trace::OpcodeTracer;
 use crate::wasmer_protected_globals::ProtectedGlobals;
+use crate::wasmer_stack_depth::{
+    enter_stack_depth_call, has_stack_depth_counters, local_function_operand_heights,
+    record_stack_depth, StackDepth,
+};
 use crate::{
     wasmer_breakpoints::*, wasmer_imports::generate_import_object, wasmer_metering::*,
     wasmer_opcode_control::OpcodeControl, wasmer_vm_hooks::VMHooksWrapper, WasmerExecutorData,
+    REPLAY_RECORD_MODE,
 };
 use log::trace;
 use klever_chain_vm_executor::{
@@ -14,7 +19,7 @@ use std::cell::RefCell;
 use std::{rc::Rc, sync::Arc};
 use std::panic::AssertUnwindSafe;
 use wasmer::Universal;
-use wasmer::{CompilerConfig, Extern, Module, Store};
+use wasmer::{CompilerConfig, Extern, Module, Store, Target};
 use wasmer::{Pages, Singlepass};
 
 const MAX_MEMORY_PAGES_ALLOWED: Pages = Pages(20);
@@ -33,8 +38,36 @@ impl WasmerInstance {
         // Use Singlepass compiler with the default settings
         let mut compiler = Singlepass::default();
 
+        // KLC-2789: the stack depth middleware weighs every frame by its operand stack
+        // height, which only a validation pass over the whole function body yields. Run it
+        // with the features the engine below compiles with (its default for the target).
+        // A module that is not valid fails here with the error Module::new would return.
+        // The module is validated twice on purpose, here and again in Module::new: the
+        // pre-pass mirrors wasmer's validation exactly, so both agree on every module.
+        // Determinism over speed. The pre-pass also applies the reserved export name rule
+        // (see `wasmer_stack_depth`).
+        trace!("Measuring operand stack heights ...");
+        let features = compiler.default_features_for_target(&Target::default());
+        let operand_heights = std::panic::catch_unwind(AssertUnwindSafe(|| {
+            match wasmer::wat2wasm(wasm_bytes) {
+                Ok(wasm) => local_function_operand_heights(&wasm, &features),
+                // Module::new reports the same conversion error before compiling anything.
+                Err(_) => Ok(Vec::new()),
+            }
+        }));
+        let operand_heights = match operand_heights {
+            Ok(Ok(operand_heights)) => operand_heights,
+            Ok(Err(err)) => return Err(Box::new(err)),
+            Err(_) => return Err(Box::new(ServiceError::new("module compilation panicked"))),
+        };
+
         // Push middlewares
-        push_middlewares(&mut compiler, compilation_options, executor_data.clone());
+        push_middlewares(
+            &mut compiler,
+            compilation_options,
+            executor_data.clone(),
+            operand_heights,
+        );
 
         // Create the store
         let store = Store::new(&Universal::new(compiler).engine());
@@ -93,8 +126,13 @@ impl WasmerInstance {
         // Use Singlepass compiler with the default settings
         let mut compiler = Singlepass::default();
 
-        // Push middlewares
-        push_middlewares(&mut compiler, compilation_options, executor_data.clone());
+        // Push middlewares. Nothing is compiled, so no operand stack heights are needed.
+        push_middlewares(
+            &mut compiler,
+            compilation_options,
+            executor_data.clone(),
+            Vec::new(),
+        );
 
         // Create the store
         let store = Store::new(&Universal::new(compiler).engine());
@@ -104,6 +142,15 @@ impl WasmerInstance {
         unsafe {
             module = Module::deserialize(&store, cache_bytes)?;
         };
+
+        // KLC-2789: a module cached before the stack depth middleware existed would run
+        // without a stack budget. The release build refuses it before instantiation runs
+        // any of its code; record mode loads it as before and skips the counters.
+        if !REPLAY_RECORD_MODE && !has_stack_depth_counters(&module) {
+            return Err(Box::new(ServiceError::new(
+                "cached module has no stack depth counters",
+            )));
+        }
 
         validate_tables(&module, compilation_options.max_declared_table_size)?;
 
@@ -220,6 +267,7 @@ fn push_middlewares(
     compiler: &mut Singlepass,
     compilation_options: &CompilationOptions,
     executor_data: Rc<RefCell<WasmerExecutorData>>,
+    local_function_operand_heights: Vec<u32>,
 ) {
     // Create breakpoints middleware
     let breakpoints_middleware = Arc::new(Breakpoints::new());
@@ -240,10 +288,14 @@ fn push_middlewares(
         breakpoints_middleware.clone(),
     ));
 
+    // Create stack_depth middleware
+    let stack_depth_middleware = Arc::new(StackDepth::new(local_function_operand_heights));
+
     // Create protected_globals middleware
     let protected_globals_middleware = Arc::new(ProtectedGlobals::new(vec![
         breakpoints_middleware.clone(),
         metering_middleware.clone(),
+        stack_depth_middleware.clone(),
     ]));
 
     trace!("Adding protected_globals middleware ...");
@@ -254,6 +306,10 @@ fn push_middlewares(
     compiler.push_middleware(opcode_control_middleware);
     trace!("Adding breakpoints middleware ...");
     compiler.push_middleware(breakpoints_middleware);
+    // Keep stack_depth after metering and protected_globals: its injected instructions
+    // must not be metered nor rejected as writes to protected globals.
+    trace!("Adding stack_depth middleware ...");
+    compiler.push_middleware(stack_depth_middleware);
 
     if compilation_options.opcode_trace {
         // Create opcode_tracer middleware
@@ -273,7 +329,12 @@ impl Instance for WasmerInstance {
             .get_function(func_name)
             .map_err(|_| "function not found".to_string())?;
 
-        match func.call(&[]) {
+        let stack_depth_call = enter_stack_depth_call(&self.wasmer_instance);
+        let result = func.call(&[]);
+        record_stack_depth(&self.wasmer_instance, func_name, result.is_err());
+        drop(stack_depth_call);
+
+        match result {
             Ok(_) => {
                 trace!("Call succeeded: {func_name}");
                 Ok(())
@@ -407,5 +468,56 @@ impl Instance for WasmerInstance {
             .map(|table_type| table_type.maximum.unwrap_or(u32::MAX))
             .max()
             .unwrap_or(0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::wasmer_stack_depth::{LEGACY_INJECTED_GLOBAL_NAMES, RESERVED_EXPORT_NAMES};
+    use klever_chain_vm_executor::VMHooksDefault;
+    use wasmer::ExternType;
+
+    /// Every global the middlewares inject must be in one of the two lists the pre-pass
+    /// checks contract exports against.
+    #[test]
+    fn injected_global_names_are_all_listed() {
+        let wasm =
+            wasmer::wat2wasm(br#"(module (memory 1) (export "memory" (memory 0)))"#).unwrap();
+        let mut compiler = Singlepass::default();
+        let features = compiler.default_features_for_target(&Target::default());
+        let operand_heights = local_function_operand_heights(&wasm, &features).unwrap();
+        let options = CompilationOptions {
+            gas_limit: 0,
+            unmetered_locals: 0,
+            max_memory_grow: 0,
+            max_memory_grow_delta: 0,
+            max_declared_table_size: usize::MAX,
+            opcode_trace: false,
+            metering: false,
+            runtime_breakpoints: false,
+            table_init_per_element_cost: 0,
+        };
+        let executor_data = Rc::new(RefCell::new(WasmerExecutorData::new(Box::new(
+            VMHooksDefault,
+        ))));
+        push_middlewares(&mut compiler, &options, executor_data, operand_heights);
+        let store = Store::new(&Universal::new(compiler).engine());
+        let module = Module::new(&store, &wasm).unwrap();
+        assert!(has_stack_depth_counters(&module));
+
+        let mut exported = module
+            .exports()
+            .filter(|export| matches!(export.ty(), ExternType::Global(_)))
+            .map(|export| export.name().to_string())
+            .collect::<Vec<_>>();
+        exported.sort();
+        let mut listed = RESERVED_EXPORT_NAMES
+            .iter()
+            .chain(LEGACY_INJECTED_GLOBAL_NAMES.iter())
+            .map(|name| name.to_string())
+            .collect::<Vec<_>>();
+        listed.sort();
+        assert_eq!(exported, listed);
     }
 }

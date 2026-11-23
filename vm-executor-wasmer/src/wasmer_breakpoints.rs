@@ -13,7 +13,7 @@ use crate::wasmer_helpers::{
     create_global_index, is_control_flow_operator, MiddlewareWithProtectedGlobals,
 };
 
-const BREAKPOINT_VALUE: &str = "breakpoint_value";
+pub(crate) const BREAKPOINT_VALUE: &str = "breakpoint_value";
 
 pub(crate) const BREAKPOINT_VALUE_NO_BREAKPOINT: u64 = 0;
 pub(crate) const BREAKPOINT_VALUE_OUT_OF_GAS: u64 = 3;
