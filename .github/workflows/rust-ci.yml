@@ -21,6 +21,10 @@ jobs:
       - name: Setup toolchain
         run: rustup default 1.99.0
       - name: Run rust tests
+        # glibc otherwise reuses cached thread stacks larger than requested, which
+        # breaks the native stack measurements in stack_weight_calibration_test.
+        env:
+          GLIBC_TUNABLES: glibc.pthread.stack_cache_size=0
         run: cargo test
   clippy_check:
     name: Clippy linter check

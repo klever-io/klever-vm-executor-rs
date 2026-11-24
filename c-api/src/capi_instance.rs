@@ -20,6 +20,17 @@ pub struct vm_exec_instance_t;
 #[repr(C)]
 pub struct vm_exec_compilation_options_t;
 
+/// Returns the size in bytes of the compilation options struct that
+/// `vm_exec_new_instance` and `vm_exec_instance_from_cache` read.
+///
+/// klever-go compares it with the size of its own compilation options struct
+/// at startup: the struct is passed by pointer, so a field missing on either
+/// side would shift every later option without any error.
+#[no_mangle]
+pub extern "C" fn vm_exec_compilation_options_size() -> u32 {
+    std::mem::size_of::<CompilationOptions>() as u32
+}
+
 pub struct CapiInstance {
     pub(crate) content: Box<dyn Instance>,
 }
@@ -254,5 +265,31 @@ pub unsafe extern "C" fn vm_exec_instance_reset(
             with_service(|service| service.update_last_error_str(message));
             vm_exec_result_t::VM_EXEC_ERROR
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `CompilationOptions` on a 64-bit target: one `u64`, four `usize` and three
+    /// `bool`, padded to the 8-byte alignment. klever-go's compilation options
+    /// struct must have the same fields in the same order.
+    const COMPILATION_OPTIONS_SIZE: usize = 48;
+
+    #[test]
+    fn compilation_options_size_is_the_struct_size() {
+        assert_eq!(
+            vm_exec_compilation_options_size() as usize,
+            std::mem::size_of::<CompilationOptions>()
+        );
+    }
+
+    #[test]
+    fn compilation_options_have_the_expected_size() {
+        assert_eq!(
+            std::mem::size_of::<CompilationOptions>(),
+            COMPILATION_OPTIONS_SIZE
+        );
     }
 }

@@ -1,21 +1,28 @@
+//! Table instructions have no price in the opcode cost schedule, so the metering
+//! middleware rejects every one of them at compile time: a contract can't change a
+//! table after instantiation. Tables filled by active element segments and called
+//! through `call_indirect` keep working.
+
 use klever_chain_vm_executor::CompilationOptions;
 
 mod common;
 
-fn table_init_wat(segment_len: usize, table_size: usize, copied_elements: usize) -> String {
-    let refs = vec!["0"; segment_len].join(" ");
+const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
+    gas_limit: 1_000_000_000,
+    ..common::DUMMY_COMPILATION_OPTIONS
+};
+
+const ONE_FUNCTION_TABLE: &str = "(table 1 1 funcref) (elem (i32.const 0) func 0)";
+
+fn module_wat(tables_and_elems: &str, body: &str) -> String {
     format!(
         r#"
 (module
     (type (;0;) (func))
     (func (;0;) (type 0))
     (func (;1;) (type 0)
-        i32.const 0
-        i32.const 0
-        i32.const {copied_elements}
-        table.init 0 0)
-    (table (;0;) {table_size} {table_size} funcref)
-    (elem func {refs})
+        {body})
+    {tables_and_elems}
     (memory (;0;) 1)
     (export "memory" (memory 0))
     (export "main" (func 1)))
@@ -23,79 +30,108 @@ fn table_init_wat(segment_len: usize, table_size: usize, copied_elements: usize)
     )
 }
 
-fn compilation_options_with_per_element_cost(cost: u64, gas_limit: u64) -> CompilationOptions {
-    CompilationOptions {
-        gas_limit,
-        table_init_per_element_cost: cost,
-        ..common::DUMMY_COMPILATION_OPTIONS
-    }
-}
-
-fn points_used_running_table_init(
-    copied_elements: usize,
-    per_element_cost: u64,
-    gas_limit: u64,
-) -> Result<u64, String> {
-    let wat = table_init_wat(1000, 1000, copied_elements);
-    let options = compilation_options_with_per_element_cost(per_element_cost, gas_limit);
-    let instance = common::test_instance_with_options(&wat, &options).unwrap();
-    instance.set_points_limit(gas_limit)?;
-    instance.set_points_used(0)?;
-    instance.call("main")?;
-    instance.get_points_used()
-}
-
-#[test]
-fn table_init_charge_is_proportional_to_copied_element_count() {
-    let per_element_cost = 10;
-
-    for copied_elements in [1usize, 10, 100, 1000] {
-        let points = points_used_running_table_init(copied_elements, per_element_cost, 1_000_000_000)
-            .unwrap();
-
-        assert_eq!(
-            points,
-            copied_elements as u64 * per_element_cost,
-            "copying {copied_elements} elements must cost {per_element_cost} gas each"
-        );
-    }
-}
-
-#[test]
-fn table_init_charge_scales_with_the_configured_per_element_cost() {
-    let single = points_used_running_table_init(100, 1, 1_000_000_000).unwrap();
-    let double = points_used_running_table_init(100, 2, 1_000_000_000).unwrap();
-
-    assert_eq!(single, 100);
-    assert_eq!(double, 200);
-}
-
-#[test]
-fn table_init_keeps_flat_metering_when_per_element_cost_is_zero() {
-    // Zero reproduces the pre-fork schedule: the element count must not be charged at
-    // all, so a one-element and a thousand-element copy stay indistinguishable.
-    let one = points_used_running_table_init(1, 0, 1_000_000_000).unwrap();
-    let many = points_used_running_table_init(1000, 0, 1_000_000_000).unwrap();
-
-    assert_eq!(one, many);
-    assert_eq!(many, 0);
-}
-
-#[test]
-fn table_init_fails_when_gas_cannot_cover_the_copied_elements() {
-    let per_element_cost = 10;
-    let copied_elements = 1000;
-    let required = copied_elements as u64 * per_element_cost;
-
-    // The inherited out-of-gas check trips on points_used >= points_limit, so covering
-    // the charge exactly is already too little: the limit has to exceed it.
-    let sufficient =
-        points_used_running_table_init(copied_elements, per_element_cost, required + 1);
-    assert_eq!(sufficient, Ok(required));
-
-    let insufficient = points_used_running_table_init(copied_elements, per_element_cost, required);
+fn assert_rejected(instruction: &str, tables_and_elems: &str, body: &str) {
+    let wat = module_wat(tables_and_elems, body);
+    let err = match common::test_instance(&wat) {
+        Ok(_) => panic!("{instruction} must not compile"),
+        Err(err) => err.to_string(),
+    };
     assert!(
-        insufficient.is_err(),
-        "a copy the caller cannot pay for must not run, got {insufficient:?}"
+        err.contains("Unsupported operator"),
+        "{instruction}: unexpected error {err:?}"
+    );
+}
+
+#[test]
+fn table_get_is_rejected() {
+    assert_rejected(
+        "table.get",
+        ONE_FUNCTION_TABLE,
+        "i32.const 0 table.get 0 drop",
+    );
+}
+
+#[test]
+fn table_set_is_rejected() {
+    assert_rejected(
+        "table.set",
+        ONE_FUNCTION_TABLE,
+        "i32.const 0 ref.null func table.set 0",
+    );
+}
+
+#[test]
+fn table_grow_is_rejected() {
+    assert_rejected(
+        "table.grow",
+        "(table 1 2 funcref)",
+        "ref.null func i32.const 1 table.grow 0 drop",
+    );
+}
+
+#[test]
+fn table_size_is_rejected() {
+    assert_rejected("table.size", ONE_FUNCTION_TABLE, "table.size 0 drop");
+}
+
+#[test]
+fn table_init_is_rejected() {
+    assert_rejected(
+        "table.init",
+        "(table 1 1 funcref) (elem func 0)",
+        "i32.const 0 i32.const 0 i32.const 1 table.init 0 0",
+    );
+}
+
+#[test]
+fn table_fill_is_rejected() {
+    assert_rejected(
+        "table.fill",
+        ONE_FUNCTION_TABLE,
+        "i32.const 0 ref.null func i32.const 1 table.fill 0",
+    );
+}
+
+#[test]
+fn table_copy_is_rejected() {
+    assert_rejected(
+        "table.copy",
+        "(table 2 2 funcref) (elem (i32.const 0) func 0)",
+        "i32.const 1 i32.const 0 i32.const 1 table.copy 0 0",
+    );
+}
+
+#[test]
+fn elem_drop_is_rejected() {
+    assert_rejected(
+        "elem.drop",
+        "(table 1 1 funcref) (elem func 0)",
+        "elem.drop 0",
+    );
+}
+
+#[test]
+fn call_indirect_through_an_active_element_segment_still_works() {
+    let wat = r#"
+(module
+    (type (;0;) (func))
+    (func (;0;) (type 0)
+        i32.const 0
+        i32.const 0x5eed5eed
+        i32.store)
+    (func (;1;) (type 0)
+        i32.const 0
+        call_indirect (type 0))
+    (table 1 1 funcref)
+    (elem (i32.const 0) func 0)
+    (memory (;0;) 1)
+    (export "memory" (memory 0))
+    (export "main" (func 1)))
+"#;
+    let instance = common::test_instance_with_options(wat, &COMPILATION_OPTIONS).unwrap();
+    instance.call("main").unwrap();
+    assert_eq!(
+        instance.memory_load(0, 4).unwrap()[..4],
+        0x5eed5eedu32.to_le_bytes()
     );
 }

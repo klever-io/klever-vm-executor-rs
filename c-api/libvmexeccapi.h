@@ -298,6 +298,16 @@ typedef struct {
 vm_exec_result_t vm_check_signatures(vm_exec_instance_t *instance_ptr);
 
 /**
+ * Returns the size in bytes of the compilation options struct that
+ * `vm_exec_new_instance` and `vm_exec_instance_from_cache` read.
+ *
+ * klever-go compares it with the size of its own compilation options struct
+ * at startup: the struct is passed by pointer, so a field missing on either
+ * side would shift every later option without any error.
+ */
+uint32_t vm_exec_compilation_options_size(void);
+
+/**
  * Destroys a VM executor object.
  *
  * # Safety
@@ -566,6 +576,16 @@ vm_exec_result_t vm_exec_new_instance(vm_exec_executor_t *executor_ptr,
                                       uint8_t *wasm_bytes_ptr,
                                       uint32_t wasm_bytes_len,
                                       const vm_exec_compilation_options_t *options_ptr);
+
+/**
+ * Returns the size in bytes of the opcode cost struct that
+ * `vm_exec_set_opcode_costs` reads.
+ *
+ * klever-go compares it with the size of its own opcode cost struct at
+ * startup: the struct is passed by pointer, so a field missing on either side
+ * would shift every later cost without any error.
+ */
+uint32_t vm_exec_opcode_cost_size(void);
 
 /**
  * Sets the log level.

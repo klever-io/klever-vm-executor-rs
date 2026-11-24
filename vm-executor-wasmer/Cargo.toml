@@ -11,15 +11,15 @@ version = "0.2.2"
 path = "../vm-executor"
 
 [dependencies]
-wasmer = { git = "https://github.com/klever-io/wasmer", rev = "85a24aa", default-features = false, features = [
+wasmer = { git = "https://github.com/klever-io/wasmer", rev = "7debeb422621c481a843ada54b16d1487deb3462", default-features = false, features = [
     "singlepass",
     "sys",
     "universal",
     "wat",
 ] }
 
-wasmer-vm = { git = "https://github.com/klever-io/wasmer", rev = "85a24aa" }
-wasmer-types = { git = "https://github.com/klever-io/wasmer", rev = "85a24aa" }
+wasmer-vm = { git = "https://github.com/klever-io/wasmer", rev = "7debeb422621c481a843ada54b16d1487deb3462" }
+wasmer-types = { git = "https://github.com/klever-io/wasmer", rev = "7debeb422621c481a843ada54b16d1487deb3462" }
 
 chrono = "0.4.23"
 log = "0.4.17"
